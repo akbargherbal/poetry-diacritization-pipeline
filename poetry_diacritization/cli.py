@@ -38,6 +38,7 @@ def cmd_generate(args):
         model=args.model,
         thinking_enabled=args.thinking,
         reasoning_effort=args.reasoning_effort,
+        save_reasoning=args.save_reasoning,
     )
     cmd_status(args)
 
@@ -61,6 +62,7 @@ def cmd_all(args):
         model=args.model,
         thinking_enabled=args.thinking,
         reasoning_effort=args.reasoning_effort,
+        save_reasoning=args.save_reasoning,
     )
     run_validation_pass(df)
     apply_threshold(df, cutoff=args.cutoff, include_rescored=args.include_rescored)
@@ -104,6 +106,23 @@ def main():
             default=config.DEFAULT_REASONING_EFFORT,
             help="Only used if --thinking is on. 'low'/'medium' aren't offered because "
             "DeepSeek's own API collapses them to 'high' anyway.",
+        )
+        save_reasoning_group = p.add_mutually_exclusive_group()
+        save_reasoning_group.add_argument(
+            "--save-reasoning",
+            dest="save_reasoning",
+            action="store_true",
+            default=config.SAVE_REASONING_ARTIFACTS,
+            help="Persist the model's reasoning/thinking trace to "
+            "runtime/raw_responses/<call_id>_reasoning.txt. Only meaningful "
+            "when --thinking is on; ignored otherwise.",
+        )
+        save_reasoning_group.add_argument(
+            "--no-save-reasoning",
+            dest="save_reasoning",
+            action="store_false",
+            help=f"Do not persist reasoning traces (default: "
+            f"{'off' if not config.SAVE_REASONING_ARTIFACTS else 'on'}).",
         )
 
     p_generate = sub.add_parser("generate", help="Call the LLM for everything still pending")

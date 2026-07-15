@@ -30,45 +30,79 @@ from .registry import save_registry
 log = logging.getLogger("poetry_diacritization")
 
 
-def _save_raw_response(call_id: str, content: str, reasoning: str | None) -> str:
+def _save_raw_response(
+    call_id: str, content: str, reasoning: str | None, save_reasoning: bool
+) -> str:
     path = os.path.join(config.RAW_RESPONSES_DIR, f"{call_id}.txt")
     with open(path, "w", encoding="utf-8") as f:
         f.write(content or "")
-    if reasoning:
+    if reasoning and save_reasoning:
         rpath = os.path.join(config.RAW_RESPONSES_DIR, f"{call_id}_reasoning.txt")
         with open(rpath, "w", encoding="utf-8") as f:
             f.write(reasoning)
     return path
 
 
-def _process_one_batch(client, batch, rate_limiter, df, lock):
+def _process_one_batch(
+    client, batch, rate_limiter, df, lock, save_reasoning, model, thinking_enabled, reasoning_effort
+):
     verse_ids = [v["id"] for v in batch["verses"]]
-    content, reasoning, error = call_llm(client, batch["verses"], rate_limiter)
+    content, reasoning, error = call_llm(
+        client,
+        batch["verses"],
+        rate_limiter,
+        model=model,
+        thinking_enabled=thinking_enabled,
+        reasoning_effort=reasoning_effort,
+    )
 
     if error is not None or content is None:
         log.warning(f"Batch for poem {batch['poem_no']} ({verse_ids}) failed: {error}")
         return
 
     call_id = uuid.uuid4().hex[:12]
-    _save_raw_response(call_id, content, reasoning)
+    _save_raw_response(call_id, content, reasoning, save_reasoning)
 
     with lock:
         df.loc[verse_ids, "status"] = "awaiting_validation"
         df.loc[verse_ids, "last_call_id"] = call_id
-        df.loc[verse_ids, "last_model"] = config.MODEL
+        df.loc[verse_ids, "last_model"] = model
         df.loc[verse_ids, "pass_count"] = df.loc[verse_ids, "pass_count"] + 1
         save_registry(df)
 
     log.info(f"Poem {batch['poem_no']}: got response for {len(verse_ids)} verses (call {call_id})")
 
 
-def run_generation_pass(df, client=None):
-    """Run one generation pass over everything in df that needs an LLM attempt."""
+def run_generation_pass(
+    df,
+    client=None,
+    model: str = None,
+    thinking_enabled: bool = None,
+    reasoning_effort: str = None,
+    save_reasoning: bool = None,
+):
+    """Run one generation pass over everything in df that needs an LLM attempt.
+
+    model/thinking_enabled/reasoning_effort default to config.py's DEFAULT_*
+    values (resolved here, once, so every batch in the pass uses the same
+    settings and `last_model` records what was actually used — not just
+    whatever config.DEFAULT_MODEL happens to be at read time).
+
+    save_reasoning defaults to config.SAVE_REASONING_ARTIFACTS (False) but can
+    be overridden per call (that's how the CLI's --save-reasoning /
+    --no-save-reasoning flags reach here).
+    """
     from .registry import make_batches
     import threading
 
     if client is None:
         client = setup_client()
+    if save_reasoning is None:
+        save_reasoning = config.SAVE_REASONING_ARTIFACTS
+    model = model or config.DEFAULT_MODEL
+    if thinking_enabled is None:
+        thinking_enabled = config.DEFAULT_THINKING_ENABLED
+    reasoning_effort = reasoning_effort or config.DEFAULT_REASONING_EFFORT
 
     batches = make_batches(df)
     if not batches:
@@ -81,7 +115,18 @@ def run_generation_pass(df, client=None):
     start = time.time()
     with ThreadPoolExecutor(max_workers=config.MAX_WORKERS) as pool:
         futures = [
-            pool.submit(_process_one_batch, client, batch, rate_limiter, df, lock)
+            pool.submit(
+                _process_one_batch,
+                client,
+                batch,
+                rate_limiter,
+                df,
+                lock,
+                save_reasoning,
+                model,
+                thinking_enabled,
+                reasoning_effort,
+            )
             for batch in batches
         ]
         for f in as_completed(futures):

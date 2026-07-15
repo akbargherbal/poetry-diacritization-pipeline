@@ -58,6 +58,14 @@ SUPPORTED_REASONING_EFFORTS = ["high", "max"]
 DEFAULT_REASONING_EFFORT = "high"
 # Override per-run with `--reasoning-effort`.
 
+# Raw model output (the JSON verse response) is always saved to
+# RAW_RESPONSES_DIR — validate.py depends on it being there.
+# The *reasoning/thinking* trace (only ever present when thinking mode is
+# on) is a separate, optional artifact. It's disabled by default: it's not
+# needed for validation, and it can balloon RAW_RESPONSES_DIR quickly at any
+# real batch volume. Override per-run with `--save-reasoning`.
+SAVE_REASONING_ARTIFACTS = False
+
 MAX_WORKERS = 6            # concurrent threads
 REQUESTS_PER_MINUTE = 6    # rate limit
 
