@@ -1,0 +1,35 @@
+2026-07-15 10:42:08,854 - INFO - Built fresh registry with 76 verses from C:\Users\DELL\Jupyter_Notebooks\poetry-diacritization-pipeline\data\SAMPLE_POEMS.pkl
+2026-07-15 10:42:09,848 - INFO - HTTP Request: GET https://api.deepseek.com/models "HTTP/1.1 200 OK"
+2026-07-15 10:42:09,851 - INFO - DeepSeek API authentication successful.
+2026-07-15 10:42:09,859 - INFO - Built 9 batches covering 76 pending verses
+2026-07-15 10:42:10,175 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-07-15 10:42:10,271 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-07-15 10:42:10,271 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-07-15 10:42:10,271 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-07-15 10:42:10,282 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-07-15 10:42:10,303 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-07-15 10:42:12,271 - INFO - Poem 132023: got response for 3 verses (call c609e24788c0)
+2026-07-15 10:42:15,376 - INFO - Poem 118432: got response for 12 verses (call 1f7c9cc0457c)
+2026-07-15 10:42:15,685 - INFO - Poem 1980: got response for 12 verses (call 6a5185e2f573)
+2026-07-15 10:42:15,953 - INFO - Poem 58959: got response for 12 verses (call 6240cbb25a83)
+2026-07-15 10:42:16,003 - INFO - Poem 132727: got response for 12 verses (call ffc1c35fd391)
+2026-07-15 10:42:17,223 - INFO - Poem 59230: got response for 12 verses (call 576831f9954a)
+2026-07-15 10:43:13,135 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-07-15 10:43:13,136 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-07-15 10:43:13,218 - INFO - HTTP Request: POST https://api.deepseek.com/chat/completions "HTTP/1.1 200 OK"
+2026-07-15 10:43:14,581 - INFO - Poem 65601: got response for 2 verses (call e7663ea068d7)
+2026-07-15 10:43:15,781 - INFO - Poem 9299: got response for 4 verses (call f04ba9507c4d)
+2026-07-15 10:43:16,985 - INFO - Poem 65481: got response for 7 verses (call 56b3b29e0010)
+2026-07-15 10:43:16,985 - INFO - Generation pass done: 9 batches in 67.1s
+2026-07-15 10:43:16,985 - INFO - Validating 76 verses across 9 raw responses
+2026-07-15 10:43:17,068 - INFO - Call e7663ea068d7: validated 2 verses
+2026-07-15 10:43:17,182 - INFO - Call c609e24788c0: validated 3 verses
+2026-07-15 10:43:20,892 - INFO - Call 6a5185e2f573: validated 12 verses
+2026-07-15 10:43:22,701 - INFO - Call 6240cbb25a83: validated 12 verses
+2026-07-15 10:43:25,682 - INFO - Call 56b3b29e0010: validated 7 verses
+2026-07-15 10:43:28,611 - INFO - Call ffc1c35fd391: validated 12 verses
+2026-07-15 10:43:34,410 - INFO - Call 1f7c9cc0457c: validated 12 verses
+2026-07-15 10:43:35,251 - INFO - Call f04ba9507c4d: validated 4 verses
+2026-07-15 10:43:36,229 - INFO - Call 576831f9954a: validated 12 verses
+2026-07-15 10:43:36,229 - INFO - Threshold 0.9: 64 newly passed, 6 marked failed_prosody
+2026-07-15 10:43:36,229 - INFO - Loaded existing registry with 76 verses from C:\Users\DELL\Jupyter_Notebooks\poetry-diacritization-pipeline\runtime\registry.pkl
