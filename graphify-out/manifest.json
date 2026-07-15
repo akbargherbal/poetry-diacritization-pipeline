@@ -20,19 +20,19 @@
     "semantic_hash": "c890d26d0faba4d4cc5b2ab06f91fe8c"
   },
   "poetry_diacritization/generate.py": {
-    "mtime": 1784103864.5154893,
-    "ast_hash": "9c68f0eba302b6f728b20864fca6c019",
-    "semantic_hash": "9c68f0eba302b6f728b20864fca6c019"
+    "mtime": 1784107722.23598,
+    "ast_hash": "0ebb29ccf27714b9dbdc554e881616a2",
+    "semantic_hash": "0ebb29ccf27714b9dbdc554e881616a2"
   },
   "poetry_diacritization/llm_client.py": {
-    "mtime": 1784103864.5154893,
-    "ast_hash": "9140781488b00b01453bc37a508304e2",
-    "semantic_hash": "9140781488b00b01453bc37a508304e2"
+    "mtime": 1784107722.23598,
+    "ast_hash": "792b44c5ce7add778c62b937d525d6b5",
+    "semantic_hash": "792b44c5ce7add778c62b937d525d6b5"
   },
   "poetry_diacritization/registry.py": {
-    "mtime": 1784103864.5154893,
-    "ast_hash": "7b7c5212ec5d9c61155adf6b977c7dfe",
-    "semantic_hash": "7b7c5212ec5d9c61155adf6b977c7dfe"
+    "mtime": 1784107722.23598,
+    "ast_hash": "3ae2a5af0dafd0abed9ca495eb904740",
+    "semantic_hash": "3ae2a5af0dafd0abed9ca495eb904740"
   },
   "poetry_diacritization/text_normalize.py": {
     "mtime": 1784103864.5154893,
@@ -55,9 +55,9 @@
     "semantic_hash": "bd8a006181a85ebba4d56468eec3768d"
   },
   "tests/conftest.py": {
-    "mtime": 1784103864.515981,
-    "ast_hash": "1bf6af6f08ae14efb41e9869de34d82e",
-    "semantic_hash": "1bf6af6f08ae14efb41e9869de34d82e"
+    "mtime": 1784107722.23598,
+    "ast_hash": "0b70c88eb00152778811667be302fbf2",
+    "semantic_hash": "0b70c88eb00152778811667be302fbf2"
   },
   "tests/test_cli.py": {
     "mtime": 1784103864.516356,
@@ -70,19 +70,19 @@
     "semantic_hash": "e72be8150981f1f1f3872fe8d8fe53dd"
   },
   "tests/test_generate.py": {
-    "mtime": 1784103864.516356,
-    "ast_hash": "576aadc799ffe12254c12b66925c2b60",
-    "semantic_hash": "576aadc799ffe12254c12b66925c2b60"
+    "mtime": 1784107722.23598,
+    "ast_hash": "bd0710911627fe77d997df586a2e1027",
+    "semantic_hash": "bd0710911627fe77d997df586a2e1027"
   },
   "tests/test_integration_llm.py": {
-    "mtime": 1784103864.516356,
-    "ast_hash": "9a28334b760b62feb2a469a0825c8945",
-    "semantic_hash": "9a28334b760b62feb2a469a0825c8945"
+    "mtime": 1784107722.23598,
+    "ast_hash": "5f9e46177749f9c8f5d3661e462c6eba",
+    "semantic_hash": "5f9e46177749f9c8f5d3661e462c6eba"
   },
   "tests/test_llm_client.py": {
-    "mtime": 1784103864.516356,
-    "ast_hash": "4601e3b29137197726f30e781496aad4",
-    "semantic_hash": "4601e3b29137197726f30e781496aad4"
+    "mtime": 1784107722.23598,
+    "ast_hash": "7aac66339543913196e850ba74e8b8cd",
+    "semantic_hash": "7aac66339543913196e850ba74e8b8cd"
   },
   "tests/test_registry.py": {
     "mtime": 1784103864.516356,
@@ -105,14 +105,9 @@
     "semantic_hash": "190613de07a3c623242507b8422e16f6"
   },
   "README.md": {
-    "mtime": 1784103864.5146585,
-    "ast_hash": "6ffaadbaae77b06faac700f9963913f8",
-    "semantic_hash": "6ffaadbaae77b06faac700f9963913f8"
-  },
-  "docs/TESTING_STRATEGY.md": {
-    "mtime": 1784103864.5146585,
-    "ast_hash": "94f46157a81a409c2346a5e8ef291c26",
-    "semantic_hash": "94f46157a81a409c2346a5e8ef291c26"
+    "mtime": 1784107722.23598,
+    "ast_hash": "74d67ff76cb7432d84adc6093cfd74e1",
+    "semantic_hash": "74d67ff76cb7432d84adc6093cfd74e1"
   },
   "requirements-dev.txt": {
     "mtime": 1784103864.5154893,
@@ -123,5 +118,30 @@
     "mtime": 1784103864.5154893,
     "ast_hash": "be60bbfae2ee54473ac0759afa06fa6f",
     "semantic_hash": "be60bbfae2ee54473ac0759afa06fa6f"
+  },
+  "poetry_diacritization/pricing.py": {
+    "mtime": 1784107722.23598,
+    "ast_hash": "b3883f1e1fe6b4d85d4925f540473aab",
+    "semantic_hash": "b3883f1e1fe6b4d85d4925f540473aab"
+  },
+  "poetry_diacritization/pricing_config.py": {
+    "mtime": 1784107722.23598,
+    "ast_hash": "b1cb75bcf9710202baf4bf8aeace79f6",
+    "semantic_hash": "b1cb75bcf9710202baf4bf8aeace79f6"
+  },
+  "tests/test_generate_cost.py": {
+    "mtime": 1784107722.23598,
+    "ast_hash": "f624cf92a023329acba9f09c65f2ee1b",
+    "semantic_hash": "f624cf92a023329acba9f09c65f2ee1b"
+  },
+  "tests/test_pricing.py": {
+    "mtime": 1784107722.23598,
+    "ast_hash": "3f0c9dfb687e1231bb1781d418be16ab",
+    "semantic_hash": "3f0c9dfb687e1231bb1781d418be16ab"
+  },
+  "tests/test_registry_cost.py": {
+    "mtime": 1784107722.23598,
+    "ast_hash": "534c3f66eec1df26200959d3c532692e",
+    "semantic_hash": "534c3f66eec1df26200959d3c532692e"
   }
 }
