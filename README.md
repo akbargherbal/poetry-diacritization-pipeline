@@ -25,6 +25,7 @@ python run.py validate
 python run.py threshold --cutoff 0.90
 
 python run.py export       # write the clean, passed-only dataset to data/
+                            # (both diacritized_verses.pkl and .csv)
 ```
 
 Or all at once: `python run.py all --cutoff 0.90` (runs generate → validate →
@@ -163,8 +164,13 @@ candidate, for debugging.
 
 ## Extending / tuning
 
-- **Different model per pass**: change `MODEL` in `config.py`, run
-  `generate` again.
+- **Different model per pass**: pass `--model` to `generate`/`all` (e.g.
+  `--model deepseek-v4-pro`), or change `DEFAULT_MODEL` in `config.py` to
+  switch the default for every future run.
+- **Thinking / reasoning mode**: off by default; turn it on per-run with
+  `--thinking` (and optionally `--reasoning-effort high|max`), or flip
+  `DEFAULT_THINKING_ENABLED` in `config.py`. Add `--save-reasoning` to
+  persist the trace to `runtime/raw_responses/<call_id>_reasoning.txt`.
 - **Batch size**: `BATCH_SIZE` in `config.py`.
 - **Rate limits / concurrency**: `REQUESTS_PER_MINUTE`, `MAX_WORKERS`.
 - **Loosen/tighten the prosody bar**: `python run.py threshold --cutoff X`
@@ -179,6 +185,21 @@ candidate, for debugging.
   (`runtime/raw_responses/<call_id>.txt`) under the current code. Pass
   `--statuses failed_prosody` (or any combination) to widen what gets
   re-checked. Safe to run repeatedly.
+
+## Testing
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+The suite in `tests/` is fully offline — `llm_client.call_llm` and
+`pyarud.ArudhProcessor` are always mocked, so running it never makes a
+network call or needs `DEEPSEEK_API_KEY`. Two pytest markers are defined
+in `pytest.ini`: `slow` (larger fixtures/iterations) and `integration`
+(tests that hit the real DeepSeek API — skipped by default, opt in with
+`pytest -m integration` and a real key). See `docs/TESTING_STRATEGY.md`
+for the testing philosophy and the reasoning behind what's covered.
 
 ## Known limitations / things to watch
 
