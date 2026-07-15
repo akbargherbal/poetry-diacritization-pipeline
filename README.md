@@ -32,8 +32,9 @@ threshold in sequence). You'll still want to run `generate`/`validate`/
 `threshold` separately across multiple passes, since that's the whole point
 of the registry — but `all` is convenient for a first pass.
 
-To try a different model on the next pass, edit `MODEL` in
-`poetry_diacritization/config.py` and run `generate` again — it will
+To try a different model on the next pass, run `generate` with the `--model` flag
+(e.g., `python run.py generate --model deepseek-v4-pro`), or edit `DEFAULT_MODEL` in
+`poetry_diacritization/config.py`, and run the generation pass again — it will
 re-attempt exactly the verses that are still not `passed`.
 
 ## Why three separate stages, not one script
@@ -112,8 +113,8 @@ The second paragraph (specifying the same `id`/`sadr`/`ajuz` structure back)
 is the one addition beyond your original wording — it's schema
 specification, not prosody reasoning, and it's what makes reliable JSON
 parsing possible at all. Thinking mode is off by default
-(`THINKING_ENABLED = False`) since the premise is recall, not reasoning —
-flip it in `config.py` if you want to A/B test whether it helps.
+(`DEFAULT_THINKING_ENABLED = False` in `config.py`) since the premise is recall, not reasoning —
+flip it there or override it per-run with `--thinking` / `--no-thinking` on the CLI if you want to A/B test whether it helps.
 
 ## Text fidelity check — what's okay, what's not
 
