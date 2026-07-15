@@ -64,26 +64,45 @@ def build_user_prompt(verses: list) -> str:
     return f"{config.PROMPT_INSTRUCTION}\n\n{payload}"
 
 
-def call_llm(client: OpenAI, verses: list, rate_limiter: SlidingWindowRateLimiter):
+def call_llm(
+    client: OpenAI,
+    verses: list,
+    rate_limiter: SlidingWindowRateLimiter,
+    model: str = None,
+    thinking_enabled: bool = None,
+    reasoning_effort: str = None,
+):
     """
     One API call for one batch of verses (a single poem's worth, <= BATCH_SIZE).
     No system prompt, by design. Returns (raw_text, reasoning_text_or_None, error_or_None).
     Never raises — network/API failure is reported back as an error string so
     the caller can mark those verse_ids for retry instead of crashing the pass.
+
+    model/thinking_enabled/reasoning_effort default to config.py's DEFAULT_*
+    values but can be overridden per call (that's how the CLI's --model,
+    --thinking/--no-thinking, and --reasoning-effort flags reach here).
     """
+    model = model or config.DEFAULT_MODEL
+    if thinking_enabled is None:
+        thinking_enabled = config.DEFAULT_THINKING_ENABLED
+    reasoning_effort = reasoning_effort or config.DEFAULT_REASONING_EFFORT
+
     rate_limiter.acquire()
     prompt_text = build_user_prompt(verses)
 
     kwargs = dict(
-        model=config.MODEL,
+        model=model,
         messages=[{"role": "user", "content": prompt_text}],
         max_tokens=config.MAX_TOKENS,
         temperature=config.TEMPERATURE,
         top_p=config.TOP_P,
+        # DeepSeek defaults thinking mode to ON — always send this
+        # explicitly so "disabled" is a real, enforced setting, not an
+        # assumption.
+        extra_body={"thinking": {"type": "enabled" if thinking_enabled else "disabled"}},
     )
-    if config.THINKING_ENABLED:
-        kwargs["reasoning_effort"] = config.REASONING_EFFORT
-        kwargs["extra_body"] = {"thinking": {"type": "enabled"}}
+    if thinking_enabled:
+        kwargs["reasoning_effort"] = reasoning_effort
 
     try:
         response = client.chat.completions.create(**kwargs)

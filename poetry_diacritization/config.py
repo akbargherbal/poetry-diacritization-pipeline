@@ -31,15 +31,32 @@ BATCH_SIZE = 12  # verses per LLM call, per poem. Your "sweet spot" number.
 # ---------------------------------------------------------------------------
 # LLM / DeepSeek settings
 # ---------------------------------------------------------------------------
-MODEL = "deepseek-v4-pro"
-MAX_TOKENS = 4000          # 12 short verses of JSON does not need 64k tokens
-TEMPERATURE = 0.4
-TOP_P = 0.9
+# DeepSeek's first-party API lineup (api-docs.deepseek.com), as of this
+# writing. deepseek-v4-flash is the cheaper/faster default; deepseek-v4-pro
+# is the stronger, more expensive one. Override per-run with `--model`.
+SUPPORTED_MODELS = ["deepseek-v4-pro", "deepseek-v4-flash"]
+DEFAULT_MODEL = "deepseek-v4-flash"
+
+MAX_TOKENS = 4000          # 12 short verses of JSON does not need 384k tokens
+TEMPERATURE = 0.4          # ignored by DeepSeek when thinking mode is on
+TOP_P = 0.9                # ignored by DeepSeek when thinking mode is on
+
 # This task is memory-recall, not reasoning — keep thinking mode OFF by
 # default so the model doesn't burn tokens deliberating on prosody rules.
-# Flip to True if you want to A/B test whether thinking mode helps recall.
-THINKING_ENABLED = False
-REASONING_EFFORT = "high"  # only used if THINKING_ENABLED is True
+# IMPORTANT: DeepSeek's API defaults thinking to ON. Disabling it requires
+# explicitly sending {"thinking": {"type": "disabled"}} — the client always
+# sends this explicitly (see llm_client.py), it's never left implicit.
+# Override per-run with `--thinking` / `--no-thinking`.
+DEFAULT_THINKING_ENABLED = False
+
+# Only meaningful when thinking is enabled. DeepSeek's own compatibility
+# mapping collapses "low"/"medium" -> "high" and "xhigh" -> "max", so those
+# are the only two settings that actually behave differently — that's why
+# only these two are exposed here rather than a four-tier low/med/high/max
+# preset that would be partly cosmetic.
+SUPPORTED_REASONING_EFFORTS = ["high", "max"]
+DEFAULT_REASONING_EFFORT = "high"
+# Override per-run with `--reasoning-effort`.
 
 MAX_WORKERS = 6            # concurrent threads
 REQUESTS_PER_MINUTE = 6    # rate limit

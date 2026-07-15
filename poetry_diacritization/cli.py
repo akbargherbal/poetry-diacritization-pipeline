@@ -33,7 +33,12 @@ def cmd_status(args):
 
 def cmd_generate(args):
     df = load_or_build_registry()
-    run_generation_pass(df)
+    run_generation_pass(
+        df,
+        model=args.model,
+        thinking_enabled=args.thinking,
+        reasoning_effort=args.reasoning_effort,
+    )
     cmd_status(args)
 
 
@@ -51,7 +56,12 @@ def cmd_threshold(args):
 
 def cmd_all(args):
     df = load_or_build_registry()
-    run_generation_pass(df)
+    run_generation_pass(
+        df,
+        model=args.model,
+        thinking_enabled=args.thinking,
+        reasoning_effort=args.reasoning_effort,
+    )
     run_validation_pass(df)
     apply_threshold(df, cutoff=args.cutoff, include_rescored=args.include_rescored)
     cmd_status(args)
@@ -67,9 +77,39 @@ def main():
     parser = argparse.ArgumentParser(prog="poetry_diacritization")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("generate", help="Call the LLM for everything still pending").set_defaults(
-        func=cmd_generate
-    )
+    def _add_llm_args(p):
+        p.add_argument(
+            "--model",
+            choices=config.SUPPORTED_MODELS,
+            default=config.DEFAULT_MODEL,
+            help=f"Which DeepSeek model to call (default: {config.DEFAULT_MODEL})",
+        )
+        think_group = p.add_mutually_exclusive_group()
+        think_group.add_argument(
+            "--thinking",
+            dest="thinking",
+            action="store_true",
+            default=None,
+            help="Enable thinking/reasoning mode",
+        )
+        think_group.add_argument(
+            "--no-thinking",
+            dest="thinking",
+            action="store_false",
+            help="Disable thinking/reasoning mode (default)",
+        )
+        p.add_argument(
+            "--reasoning-effort",
+            choices=config.SUPPORTED_REASONING_EFFORTS,
+            default=config.DEFAULT_REASONING_EFFORT,
+            help="Only used if --thinking is on. 'low'/'medium' aren't offered because "
+            "DeepSeek's own API collapses them to 'high' anyway.",
+        )
+
+    p_generate = sub.add_parser("generate", help="Call the LLM for everything still pending")
+    _add_llm_args(p_generate)
+    p_generate.set_defaults(func=cmd_generate)
+
     sub.add_parser("validate", help="Parse + check fidelity + score with pyarud, offline").set_defaults(
         func=cmd_validate
     )
@@ -80,6 +120,7 @@ def main():
     p_threshold.set_defaults(func=cmd_threshold)
 
     p_all = sub.add_parser("all", help="Run generate -> validate -> threshold in one go")
+    _add_llm_args(p_all)
     p_all.add_argument("--cutoff", type=float, default=0.90)
     p_all.add_argument("--include-rescored", action="store_true")
     p_all.set_defaults(func=cmd_all)
