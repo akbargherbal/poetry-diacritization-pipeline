@@ -69,7 +69,7 @@ def test_process_one_batch_success_updates_registry(monkeypatch, make_registry_d
     )
     batch = _batch_for(["1_001"])
 
-    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: ("[]", None, None))
+    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: ("[]", None, None, None))
     save_calls = []
     monkeypatch.setattr(generate, "save_registry", lambda d: save_calls.append(1))
 
@@ -100,7 +100,7 @@ def test_process_one_batch_failure_leaves_registry_untouched(monkeypatch, make_r
     before = df.copy(deep=True)
     batch = _batch_for(["1_001"])
 
-    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: (None, None, "boom"))
+    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: (None, None, "boom", None))
     save_calls = []
     monkeypatch.setattr(generate, "save_registry", lambda d: save_calls.append(1))
 
@@ -143,7 +143,7 @@ def test_run_generation_pass_uses_config_default_when_save_reasoning_not_given(
 ):
     df = make_registry_df([{"verse_id": "1_001", "poem_no": 1, "status": "pending"}])
     monkeypatch.setattr(config, "SAVE_REASONING_ARTIFACTS", False)
-    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: ("[]", "some reasoning", None))
+    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: ("[]", "some reasoning", None, None))
 
     run_generation_pass(df, client=object())
 
@@ -158,7 +158,7 @@ def test_run_generation_pass_explicit_save_reasoning_overrides_config_default(
     df = make_registry_df([{"verse_id": "1_001", "poem_no": 1, "status": "pending"}])
     # Config default says "don't save"...
     monkeypatch.setattr(config, "SAVE_REASONING_ARTIFACTS", False)
-    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: ("[]", "some reasoning", None))
+    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: ("[]", "some reasoning", None, None))
 
     # ...but an explicit True passed to the function wins.
     run_generation_pass(df, client=object(), save_reasoning=True)
@@ -172,7 +172,7 @@ def test_run_generation_pass_records_last_model_used(monkeypatch, make_registry_
     # Regression test: previously this referenced a nonexistent
     # `config.MODEL`, which raised AttributeError on every real run.
     df = make_registry_df([{"verse_id": "1_001", "poem_no": 1, "status": "pending"}])
-    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: ("[]", None, None))
+    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: ("[]", None, None, None))
 
     run_generation_pass(df, client=object(), model="deepseek-v4-pro")
 
@@ -182,7 +182,7 @@ def test_run_generation_pass_records_last_model_used(monkeypatch, make_registry_
 def test_run_generation_pass_defaults_model_from_config(monkeypatch, make_registry_df):
     df = make_registry_df([{"verse_id": "1_001", "poem_no": 1, "status": "pending"}])
     monkeypatch.setattr(config, "DEFAULT_MODEL", "deepseek-v4-flash")
-    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: ("[]", None, None))
+    monkeypatch.setattr(generate, "call_llm", lambda *a, **k: ("[]", None, None, None))
 
     run_generation_pass(df, client=object())
 
@@ -197,7 +197,7 @@ def test_run_generation_pass_passes_thinking_settings_to_call_llm(monkeypatch, m
         seen_kwargs.update(
             model=model, thinking_enabled=thinking_enabled, reasoning_effort=reasoning_effort
         )
-        return "[]", None, None
+        return "[]", None, None, None
 
     monkeypatch.setattr(generate, "call_llm", fake_call_llm)
 

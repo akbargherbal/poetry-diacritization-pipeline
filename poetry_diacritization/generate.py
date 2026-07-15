@@ -25,6 +25,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from . import config
 from .llm_client import SlidingWindowRateLimiter, call_llm, setup_client
+from .pricing import calculate_cost
 from .registry import save_registry
 
 log = logging.getLogger("poetry_diacritization")
@@ -43,11 +44,44 @@ def _save_raw_response(
     return path
 
 
+def _cost_fields_for_batch(model: str, usage: dict | None, n: int) -> dict | None:
+    """
+    Turn one call's token usage into a *per-verse* share of that call's
+    tokens/cost — the call covers `n` verses (one poem-batch), so dividing
+    by `n` here is what makes `df["cumulative_cost_usd"].sum()` an
+    accurate registry-wide total later (see registry.cost_summary).
+
+    Returns None (touch nothing) if the API gave us no usage block at all.
+    Cost itself may still come back None inside the dict (e.g. no
+    pricing_config.py, or `model` isn't priced) — that's fine, the token
+    counts are still worth recording even when the cost can't be.
+    """
+    if usage is None or n <= 0:
+        return None
+
+    cost = calculate_cost(
+        model,
+        usage["cache_hit_tokens"],
+        usage["cache_miss_tokens"],
+        usage["completion_tokens"],
+    )
+
+    def _share(value):
+        return value / n if value is not None else None
+
+    return {
+        "input_tokens_cache_hit": _share(usage["cache_hit_tokens"]),
+        "input_tokens_cache_miss": _share(usage["cache_miss_tokens"]),
+        "output_tokens": _share(usage["completion_tokens"]),
+        "call_cost_usd": _share(cost),
+    }
+
+
 def _process_one_batch(
     client, batch, rate_limiter, df, lock, save_reasoning, model, thinking_enabled, reasoning_effort
 ):
     verse_ids = [v["id"] for v in batch["verses"]]
-    content, reasoning, error = call_llm(
+    content, reasoning, error, usage = call_llm(
         client,
         batch["verses"],
         rate_limiter,
@@ -62,12 +96,23 @@ def _process_one_batch(
 
     call_id = uuid.uuid4().hex[:12]
     _save_raw_response(call_id, content, reasoning, save_reasoning)
+    cost_fields = _cost_fields_for_batch(model, usage, len(verse_ids))
 
     with lock:
         df.loc[verse_ids, "status"] = "awaiting_validation"
         df.loc[verse_ids, "last_call_id"] = call_id
         df.loc[verse_ids, "last_model"] = model
         df.loc[verse_ids, "pass_count"] = df.loc[verse_ids, "pass_count"] + 1
+        if cost_fields is not None:
+            df.loc[verse_ids, "input_tokens_cache_hit"] = cost_fields["input_tokens_cache_hit"]
+            df.loc[verse_ids, "input_tokens_cache_miss"] = cost_fields["input_tokens_cache_miss"]
+            df.loc[verse_ids, "output_tokens"] = cost_fields["output_tokens"]
+            df.loc[verse_ids, "call_cost_usd"] = cost_fields["call_cost_usd"]
+            if cost_fields["call_cost_usd"] is not None:
+                df.loc[verse_ids, "cumulative_cost_usd"] = (
+                    df.loc[verse_ids, "cumulative_cost_usd"].fillna(0)
+                    + cost_fields["call_cost_usd"]
+                )
         save_registry(df)
 
     log.info(f"Poem {batch['poem_no']}: got response for {len(verse_ids)} verses (call {call_id})")

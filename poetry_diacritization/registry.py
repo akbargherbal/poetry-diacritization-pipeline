@@ -33,6 +33,20 @@ REGISTRY_COLUMNS = [
     "pass_count",
     "last_model",
     "last_call_id",
+    # -- Cost tracking (see pricing.py / pricing_config.py) -----------------
+    # A generate() call covers a whole poem-batch (<= BATCH_SIZE verses),
+    # not a single verse — so every field below is that call's total
+    # divided evenly across the verses it covered. That's deliberate: it
+    # means `df["cumulative_cost_usd"].sum()` (or any of the token columns)
+    # gives an accurate running total for the whole registry, with no
+    # de-duplication by `last_call_id` needed. See `cost_summary()`.
+    # Always None if pricing_config.py is missing/incomplete, or the API
+    # response carried no usage block — cost tracking never blocks a run.
+    "input_tokens_cache_hit",   # this verse's share of the last call's prompt_cache_hit_tokens
+    "input_tokens_cache_miss",  # this verse's share of the last call's prompt_cache_miss_tokens
+    "output_tokens",            # this verse's share of the last call's completion_tokens
+    "call_cost_usd",            # this verse's share of the *last* call's cost
+    "cumulative_cost_usd",      # running total of call_cost_usd across every attempt so far
 ]
 
 _save_lock = threading.Lock()
@@ -64,6 +78,11 @@ def build_registry_from_input(input_pickle_path: str = config.INPUT_PICKLE) -> p
                     "pass_count": 0,
                     "last_model": None,
                     "last_call_id": None,
+                    "input_tokens_cache_hit": None,
+                    "input_tokens_cache_miss": None,
+                    "output_tokens": None,
+                    "call_cost_usd": None,
+                    "cumulative_cost_usd": 0.0,
                 }
             )
 
@@ -81,9 +100,23 @@ def build_registry_from_input(input_pickle_path: str = config.INPUT_PICKLE) -> p
     return df
 
 
+def _ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Backfill any registry columns added by a newer version of the code
+    (e.g. the cost-tracking columns) onto an older registry.pkl saved
+    before they existed — so upgrading never requires rebuilding the
+    registry from scratch. New columns default to None/NaN (0.0 for
+    cumulative_cost_usd, so it's always safely summable).
+    """
+    for col in REGISTRY_COLUMNS:
+        if col not in df.columns:
+            df[col] = 0.0 if col == "cumulative_cost_usd" else None
+    return df
+
+
 def load_or_build_registry() -> pd.DataFrame:
     if os.path.exists(config.REGISTRY_PATH):
         df = pd.read_pickle(config.REGISTRY_PATH)
+        df = _ensure_columns(df)
         log.info(f"Loaded existing registry with {len(df)} verses from {config.REGISTRY_PATH}")
         return df
     df = build_registry_from_input()
@@ -101,6 +134,49 @@ def save_registry(df: pd.DataFrame) -> None:
 
 def status_counts(df: pd.DataFrame) -> pd.Series:
     return df["status"].value_counts(dropna=False)
+
+
+def cost_summary(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Per-model spend breakdown, straight from the registry pickle:
+
+        >>> import pandas as pd
+        >>> from poetry_diacritization.registry import cost_summary
+        >>> df = pd.read_pickle("runtime/registry.pkl")
+        >>> cost_summary(df)
+                            verses  input_tokens_cache_hit  input_tokens_cache_miss  output_tokens  total_cost_usd
+        deepseek-v4-flash      120                   340.0                   9800.0         6100.0        0.003842
+        TOTAL                  120                   340.0                   9800.0         6100.0        0.003842
+
+    Every cost/token column on the registry already holds this verse's
+    *share* of whatever call last touched it (see REGISTRY_COLUMNS), so a
+    plain `.sum()` per model is an accurate total — no de-duplication by
+    `last_call_id` needed. Verses never sent to the LLM yet (no
+    `last_model`) are excluded. A verse revisited across multiple passes
+    (possibly under different models) contributes its cost to whichever
+    model most recently touched it — fine for a spend overview, but not a
+    per-pass audit trail.
+    """
+    spent = df[df["last_model"].notna()]
+    columns = [
+        "verses",
+        "input_tokens_cache_hit",
+        "input_tokens_cache_miss",
+        "output_tokens",
+        "total_cost_usd",
+    ]
+    if spent.empty:
+        return pd.DataFrame(columns=columns)
+
+    summary = spent.groupby("last_model").agg(
+        verses=("verse_id", "count"),
+        input_tokens_cache_hit=("input_tokens_cache_hit", "sum"),
+        input_tokens_cache_miss=("input_tokens_cache_miss", "sum"),
+        output_tokens=("output_tokens", "sum"),
+        total_cost_usd=("cumulative_cost_usd", "sum"),
+    )
+    summary.loc["TOTAL"] = summary.sum(numeric_only=True)
+    return summary
 
 
 def make_batches(df: pd.DataFrame, batch_size: int = config.BATCH_SIZE):

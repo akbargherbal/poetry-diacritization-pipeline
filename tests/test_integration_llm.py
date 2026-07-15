@@ -57,7 +57,7 @@ def test_real_call_llm_returns_parseable_json(real_client):
         {"id": "test_002", "sadr": "فتوضح فالمقراة لم يعف رسمها", "ajuz": "لما نسجتها من جنوب وشمأل"},
     ]
 
-    content, reasoning, error = call_llm(
+    content, reasoning, error, usage = call_llm(
         real_client,
         verses,
         rate_limiter,
@@ -101,7 +101,7 @@ def test_real_call_llm_with_thinking_enabled_returns_reasoning(real_client):
         {"id": "test_001", "sadr": "قفا نبك من ذكرى حبيب ومنزل", "ajuz": "بسقط اللوى بين الدخول فحومل"},
     ]
 
-    content, reasoning, error = call_llm(
+    content, reasoning, error, usage = call_llm(
         real_client,
         verses,
         rate_limiter,

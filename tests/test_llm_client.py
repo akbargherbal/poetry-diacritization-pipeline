@@ -90,7 +90,7 @@ def test_call_llm_sends_thinking_disabled_explicitly_by_default(
     monkeypatch.setattr(config, "DEFAULT_THINKING_ENABLED", False)
     client = fake_openai_client(response_content="[]")
 
-    content, reasoning, error = call_llm(client, [{"id": "1"}], fake_rate_limiter)
+    content, reasoning, error, usage = call_llm(client, [{"id": "1"}], fake_rate_limiter)
 
     assert error is None
     assert content == "[]"
@@ -105,7 +105,7 @@ def test_call_llm_sends_thinking_enabled_and_reasoning_effort(
 ):
     client = fake_openai_client(response_content="[]", reasoning_content="because...")
 
-    content, reasoning, error = call_llm(
+    content, reasoning, error, usage = call_llm(
         client,
         [{"id": "1"}],
         fake_rate_limiter,
@@ -123,7 +123,7 @@ def test_call_llm_sends_thinking_enabled_and_reasoning_effort(
 def test_call_llm_never_raises_on_client_exception(fake_openai_client, fake_rate_limiter):
     client = fake_openai_client(raise_exc=RuntimeError("network exploded"))
 
-    content, reasoning, error = call_llm(client, [{"id": "1"}], fake_rate_limiter)
+    content, reasoning, error, usage = call_llm(client, [{"id": "1"}], fake_rate_limiter)
 
     assert content is None
     assert reasoning is None

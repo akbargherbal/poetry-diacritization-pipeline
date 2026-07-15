@@ -70,6 +70,7 @@ per-verse table once, on first run.
 | `pyarud_detail` | small dict (input/reference bit-patterns), for debugging |
 | `pass_count` | how many times an LLM has attempted this verse |
 | `last_model`, `last_call_id` | which model, and which raw response file, produced the current candidate |
+| `input_tokens_cache_hit`, `input_tokens_cache_miss`, `output_tokens`, `call_cost_usd`, `cumulative_cost_usd` | DeepSeek batch-cost tracking — see [Cost tracking](#cost-tracking-pricing_configpy) below |
 
 ### Status lifecycle
 
@@ -185,6 +186,43 @@ candidate, for debugging.
   (`runtime/raw_responses/<call_id>.txt`) under the current code. Pass
   `--statuses failed_prosody` (or any combination) to widen what gets
   re-checked. Safe to run repeatedly.
+
+## Cost tracking (`pricing_config.py`)
+
+Every `generate` pass records DeepSeek's token usage for each call and,
+if pricing is available, its dollar cost — right in `runtime/registry.pkl`,
+no separate ledger file to keep in sync. New columns on every verse row:
+
+| column | meaning |
+|---|---|
+| `input_tokens_cache_hit` / `input_tokens_cache_miss` | this verse's share of its last call's prompt tokens, split hit/miss per DeepSeek's context-cache pricing |
+| `output_tokens` | this verse's share of its last call's generated tokens |
+| `call_cost_usd` | this verse's share of the *last* call's dollar cost |
+| `cumulative_cost_usd` | running total across every attempt this verse has ever needed |
+
+A `generate` call covers a whole poem-batch (up to `BATCH_SIZE` verses),
+not one verse — so each of these is that call's total **divided evenly**
+across the verses it covered. That's what makes `df["cumulative_cost_usd"].sum()`
+(or any of the token columns) an accurate total across the whole registry,
+with no de-duplication by `last_call_id` needed:
+
+```python
+import pandas as pd
+from poetry_diacritization.registry import cost_summary
+
+df = pd.read_pickle("runtime/registry.pkl")
+print(f"Total spend so far: ${df['cumulative_cost_usd'].sum():.4f}")
+cost_summary(df)   # a per-model breakdown table, TOTAL row included
+```
+
+**Pricing is entirely optional.** Rates live in
+`poetry_diacritization/pricing_config.py` — a small, heavily-commented,
+hand-editable dict, kept separate from the pipeline code specifically so
+you can update it the moment DeepSeek changes their prices, without
+touching anything else. If you delete that file, or a model you use isn't
+in it, nothing breaks: the token columns still populate from the API's
+`usage` response, only `call_cost_usd`/`cumulative_cost_usd` are left as
+`None`/unchanged for the affected calls.
 
 ## Testing
 

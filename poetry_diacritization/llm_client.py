@@ -64,6 +64,43 @@ def build_user_prompt(verses: list) -> str:
     return f"{config.PROMPT_INSTRUCTION}\n\n{payload}"
 
 
+def _extract_usage(response) -> dict | None:
+    """
+    Pull token counts out of the API response's `usage` block, for cost
+    tracking (see pricing.py). Returns None — never raises — if the
+    response has no usage info at all.
+
+    DeepSeek's usage object splits input tokens into
+    `prompt_cache_hit_tokens` + `prompt_cache_miss_tokens` (which sum to
+    `prompt_tokens`); if a deployment only sends one of the two, the other
+    is derived rather than assumed to be zero.
+    """
+    usage_obj = getattr(response, "usage", None)
+    if usage_obj is None:
+        return None
+
+    prompt_tokens = getattr(usage_obj, "prompt_tokens", None)
+    completion_tokens = getattr(usage_obj, "completion_tokens", None)
+    cache_hit_tokens = getattr(usage_obj, "prompt_cache_hit_tokens", None)
+    cache_miss_tokens = getattr(usage_obj, "prompt_cache_miss_tokens", None)
+
+    if cache_hit_tokens is None and prompt_tokens is not None and cache_miss_tokens is not None:
+        cache_hit_tokens = prompt_tokens - cache_miss_tokens
+    if cache_miss_tokens is None and prompt_tokens is not None and cache_hit_tokens is not None:
+        cache_miss_tokens = prompt_tokens - cache_hit_tokens
+    if cache_hit_tokens is None:
+        cache_hit_tokens = 0
+    if cache_miss_tokens is None:
+        cache_miss_tokens = prompt_tokens
+
+    return {
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+        "cache_hit_tokens": cache_hit_tokens,
+        "cache_miss_tokens": cache_miss_tokens,
+    }
+
+
 def call_llm(
     client: OpenAI,
     verses: list,
@@ -74,9 +111,14 @@ def call_llm(
 ):
     """
     One API call for one batch of verses (a single poem's worth, <= BATCH_SIZE).
-    No system prompt, by design. Returns (raw_text, reasoning_text_or_None, error_or_None).
+    No system prompt, by design. Returns
+    (raw_text, reasoning_text_or_None, error_or_None, usage_dict_or_None).
     Never raises — network/API failure is reported back as an error string so
     the caller can mark those verse_ids for retry instead of crashing the pass.
+
+    `usage_dict_or_None` is for cost tracking (see pricing.py) — it's
+    always None on error, and best-effort (may still be None on success if
+    the API response carried no usage block).
 
     model/thinking_enabled/reasoning_effort default to config.py's DEFAULT_*
     values but can be overridden per call (that's how the CLI's --model,
@@ -108,7 +150,8 @@ def call_llm(
         response = client.chat.completions.create(**kwargs)
         content = response.choices[0].message.content
         reasoning = getattr(response.choices[0].message, "reasoning_content", None)
-        return content, reasoning, None
+        usage = _extract_usage(response)
+        return content, reasoning, None, usage
     except Exception as e:
         log.error(f"LLM call failed for poem batch: {e}")
-        return None, None, str(e)
+        return None, None, str(e), None

@@ -71,6 +71,11 @@ def make_registry_df():
             "pass_count": 0,
             "last_model": None,
             "last_call_id": None,
+            "input_tokens_cache_hit": None,
+            "input_tokens_cache_miss": None,
+            "output_tokens": None,
+            "call_cost_usd": None,
+            "cumulative_cost_usd": 0.0,
         }
         full_rows = []
         for row in rows:
@@ -131,9 +136,28 @@ class FakeChoice:
         )()
 
 
+class FakeUsage:
+    """Duck-typed stand-in for the OpenAI-SDK usage object, DeepSeek-shaped
+    (adds prompt_cache_hit_tokens / prompt_cache_miss_tokens on top of the
+    standard prompt_tokens / completion_tokens)."""
+
+    def __init__(
+        self,
+        prompt_tokens=0,
+        completion_tokens=0,
+        prompt_cache_hit_tokens=0,
+        prompt_cache_miss_tokens=0,
+    ):
+        self.prompt_tokens = prompt_tokens
+        self.completion_tokens = completion_tokens
+        self.prompt_cache_hit_tokens = prompt_cache_hit_tokens
+        self.prompt_cache_miss_tokens = prompt_cache_miss_tokens
+
+
 class FakeCompletion:
-    def __init__(self, content, reasoning_content=None):
+    def __init__(self, content, reasoning_content=None, usage=None):
         self.choices = [FakeChoice(content, reasoning_content)]
+        self.usage = usage
 
 
 class FakeOpenAIClient:
@@ -144,11 +168,12 @@ class FakeOpenAIClient:
     without ever touching the network.
     """
 
-    def __init__(self, response_content="{}", reasoning_content=None, raise_exc=None):
+    def __init__(self, response_content="{}", reasoning_content=None, raise_exc=None, usage=None):
         self.calls = []
         self._response_content = response_content
         self._reasoning_content = reasoning_content
         self._raise_exc = raise_exc
+        self._usage = usage
 
         outer = self
 
@@ -157,7 +182,7 @@ class FakeOpenAIClient:
                 outer.calls.append(kwargs)
                 if outer._raise_exc is not None:
                     raise outer._raise_exc
-                return FakeCompletion(outer._response_content, outer._reasoning_content)
+                return FakeCompletion(outer._response_content, outer._reasoning_content, outer._usage)
 
         class _Chat:
             def __init__(self):
@@ -168,13 +193,18 @@ class FakeOpenAIClient:
 
 @pytest.fixture
 def fake_openai_client():
-    """Factory fixture: build a FakeOpenAIClient with a canned response."""
+    """Factory fixture: build a FakeOpenAIClient with a canned response.
 
-    def _make(response_content="{}", reasoning_content=None, raise_exc=None):
+    Pass `usage=FakeUsage(...)` (imported from this module) to simulate a
+    DeepSeek response's token-usage block for cost-tracking tests.
+    """
+
+    def _make(response_content="{}", reasoning_content=None, raise_exc=None, usage=None):
         return FakeOpenAIClient(
             response_content=response_content,
             reasoning_content=reasoning_content,
             raise_exc=raise_exc,
+            usage=usage,
         )
 
     return _make
