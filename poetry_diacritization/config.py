@@ -11,6 +11,77 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 INPUT_PICKLE = os.path.join(BASE_DIR, "data", "SAMPLE_POEMS.pkl")
 
+# Env var override: point at any input pickle without touching the CLI.
+# Lowest priority after an explicit --input/path argument, higher priority
+# than auto-detection. See resolve_input_pickle() below.
+INPUT_PICKLE_ENV_VAR = "POETRY_DIACRITIZATION_INPUT"
+
+
+def resolve_input_pickle(explicit=None):
+    """Decide which batch-level pickle to build the registry from.
+
+    This used to be a single hardcoded constant (INPUT_PICKLE), which broke
+    the moment anyone swapped in their own DataFrame under a different
+    filename -- e.g. `data/SAMPLE_100_BATCHES.pkl` instead of
+    `data/SAMPLE_POEMS.pkl`. Resolution order, first match wins:
+
+      1. `explicit` -- an exact path, e.g. from `--input` on the CLI.
+      2. The `POETRY_DIACRITIZATION_INPUT` environment variable.
+      3. Auto-detect: if exactly one `*.pkl` file sits in `data/` (ignoring
+         this pipeline's own export outputs), use it.
+      4. Fall back to the historical default, `data/SAMPLE_POEMS.pkl`.
+
+    Raises FileNotFoundError with an actionable message if an explicit or
+    env-var path doesn't exist, or if `data/` contains multiple candidate
+    pickles and none of them is the default -- rather than silently
+    guessing wrong.
+    """
+    if explicit:
+        path = os.path.abspath(explicit)
+        if not os.path.isfile(path):
+            raise FileNotFoundError(f"--input path does not exist: {path}")
+        return path
+
+    env_path = os.environ.get(INPUT_PICKLE_ENV_VAR)
+    if env_path:
+        path = os.path.abspath(env_path)
+        if not os.path.isfile(path):
+            raise FileNotFoundError(
+                f"${INPUT_PICKLE_ENV_VAR} points to a file that doesn't exist: {path}"
+            )
+        return path
+
+    data_dir = os.path.join(BASE_DIR, "data")
+    export_names = {os.path.basename(os.path.join(BASE_DIR, "data", "diacritized_verses.pkl"))}
+    candidates = (
+        sorted(
+            f
+            for f in os.listdir(data_dir)
+            if f.endswith(".pkl") and f not in export_names
+        )
+        if os.path.isdir(data_dir)
+        else []
+    )
+
+    if len(candidates) == 1:
+        return os.path.join(data_dir, candidates[0])
+
+    if len(candidates) > 1:
+        default_name = os.path.basename(INPUT_PICKLE)
+        if default_name in candidates:
+            return INPUT_PICKLE
+        raise FileNotFoundError(
+            f"Multiple .pkl files found in {data_dir} and none is the "
+            f"default ({default_name}): {candidates}. Pass --input "
+            "path/to/your.pkl (or set POETRY_DIACRITIZATION_INPUT) to "
+            "disambiguate."
+        )
+
+    # Nothing in data/ at all -- fall back to the default so the resulting
+    # FileNotFoundError (raised by pd.read_pickle) names a familiar path.
+    return INPUT_PICKLE
+
+
 RUNTIME_DIR = os.path.join(BASE_DIR, "runtime")
 REGISTRY_PATH = os.path.join(RUNTIME_DIR, "registry.pkl")
 RAW_RESPONSES_DIR = os.path.join(RUNTIME_DIR, "raw_responses")

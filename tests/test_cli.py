@@ -16,7 +16,7 @@ def stub_pipeline_funcs(monkeypatch, make_registry_df):
     calls = {}
     df = make_registry_df([{"verse_id": "1_001", "status": "pending"}])
 
-    monkeypatch.setattr(cli, "load_or_build_registry", lambda: df)
+    monkeypatch.setattr(cli, "load_or_build_registry", lambda *a, **k: df)
 
     def _record(name):
         def _fn(*args, **kwargs):
@@ -176,3 +176,32 @@ def test_model_flag_passed_through(monkeypatch, stub_pipeline_funcs):
     _run_cli(monkeypatch, ["generate", "--model", model])
     _, kwargs = stub_pipeline_funcs["run_generation_pass"]
     assert kwargs["model"] == model
+
+
+def test_input_flag_is_passed_to_load_or_build_registry(monkeypatch, make_registry_df):
+    df = make_registry_df([{"verse_id": "1_001", "status": "pending"}])
+    captured = {}
+
+    def _fake_load(path=None):
+        captured["path"] = path
+        return df
+
+    monkeypatch.setattr(cli, "load_or_build_registry", _fake_load)
+    monkeypatch.setattr(cli, "status_counts", lambda df: df["status"].value_counts())
+    monkeypatch.setattr(cli, "score_distribution", lambda df: None)
+
+    _run_cli(monkeypatch, ["status", "--input", "/tmp/my_poems.pkl"])
+
+    assert captured["path"] == "/tmp/my_poems.pkl"
+
+
+def test_no_input_flag_defaults_to_none(monkeypatch, stub_pipeline_funcs):
+    captured = {}
+
+    def _fake_load(path=None):
+        captured["path"] = path
+        return None
+
+    monkeypatch.setattr(cli, "load_or_build_registry", _fake_load)
+    _run_cli(monkeypatch, ["export"])
+    assert captured["path"] is None

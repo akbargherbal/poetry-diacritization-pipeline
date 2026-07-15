@@ -21,7 +21,7 @@ def _setup_logging():
 
 
 def cmd_status(args):
-    df = load_or_build_registry()
+    df = load_or_build_registry(getattr(args, "input", None))
     print("\nStatus counts:")
     print(status_counts(df).to_string())
     dist = score_distribution(df)
@@ -32,7 +32,7 @@ def cmd_status(args):
 
 
 def cmd_generate(args):
-    df = load_or_build_registry()
+    df = load_or_build_registry(getattr(args, "input", None))
     run_generation_pass(
         df,
         model=args.model,
@@ -44,13 +44,13 @@ def cmd_generate(args):
 
 
 def cmd_validate(args):
-    df = load_or_build_registry()
+    df = load_or_build_registry(getattr(args, "input", None))
     run_validation_pass(df)
     cmd_status(args)
 
 
 def cmd_revalidate(args):
-    df = load_or_build_registry()
+    df = load_or_build_registry(getattr(args, "input", None))
     df, reset_ids, skipped_ids = reset_for_revalidation(df, statuses=tuple(args.statuses))
     if not reset_ids:
         print(f"Nothing to revalidate (no rows in {list(args.statuses)} with a saved raw response).")
@@ -63,13 +63,13 @@ def cmd_revalidate(args):
 
 
 def cmd_threshold(args):
-    df = load_or_build_registry()
+    df = load_or_build_registry(getattr(args, "input", None))
     apply_threshold(df, cutoff=args.cutoff, include_rescored=args.include_rescored)
     cmd_status(args)
 
 
 def cmd_all(args):
-    df = load_or_build_registry()
+    df = load_or_build_registry(getattr(args, "input", None))
     run_generation_pass(
         df,
         model=args.model,
@@ -83,7 +83,7 @@ def cmd_all(args):
 
 
 def cmd_export(args):
-    df = load_or_build_registry()
+    df = load_or_build_registry(getattr(args, "input", None))
     export_passed(df)
 
 
@@ -91,6 +91,21 @@ def main():
     _setup_logging()
     parser = argparse.ArgumentParser(prog="poetry_diacritization")
     sub = parser.add_subparsers(dest="command", required=True)
+
+    def _add_input_arg(p):
+        p.add_argument(
+            "--input",
+            dest="input",
+            default=None,
+            help=(
+                "Path to your batch-level input pickle (a DataFrame with "
+                "poem_no/meter/DATA columns), replacing data/SAMPLE_POEMS.pkl. "
+                "Only used the first time a run builds runtime/registry.pkl; "
+                "ignored once that registry already exists. If omitted, falls "
+                f"back to ${config.INPUT_PICKLE_ENV_VAR} if set, then to the "
+                "only *.pkl found in data/, then to data/SAMPLE_POEMS.pkl."
+            ),
+        )
 
     def _add_llm_args(p):
         p.add_argument(
@@ -140,11 +155,12 @@ def main():
 
     p_generate = sub.add_parser("generate", help="Call the LLM for everything still pending")
     _add_llm_args(p_generate)
+    _add_input_arg(p_generate)
     p_generate.set_defaults(func=cmd_generate)
 
-    sub.add_parser("validate", help="Parse + check fidelity + score with pyarud, offline").set_defaults(
-        func=cmd_validate
-    )
+    p_validate = sub.add_parser("validate", help="Parse + check fidelity + score with pyarud, offline")
+    _add_input_arg(p_validate)
+    p_validate.set_defaults(func=cmd_validate)
 
     p_revalidate = sub.add_parser(
         "revalidate",
@@ -157,25 +173,29 @@ def main():
         default=["failed_text_mismatch", "failed_parse"],
         help="Which status(es) to reset and re-check (default: %(default)s)",
     )
+    _add_input_arg(p_revalidate)
     p_revalidate.set_defaults(func=cmd_revalidate)
 
     p_threshold = sub.add_parser("threshold", help="Turn stored pyarud scores into passed/failed")
     p_threshold.add_argument("--cutoff", type=float, default=0.90)
     p_threshold.add_argument("--include-rescored", action="store_true")
+    _add_input_arg(p_threshold)
     p_threshold.set_defaults(func=cmd_threshold)
 
     p_all = sub.add_parser("all", help="Run generate -> validate -> threshold in one go")
     _add_llm_args(p_all)
     p_all.add_argument("--cutoff", type=float, default=0.90)
     p_all.add_argument("--include-rescored", action="store_true")
+    _add_input_arg(p_all)
     p_all.set_defaults(func=cmd_all)
 
-    sub.add_parser("status", help="Print status counts and score distribution").set_defaults(
-        func=cmd_status
-    )
-    sub.add_parser("export", help="Write the clean passed-only dataset to data/").set_defaults(
-        func=cmd_export
-    )
+    p_status = sub.add_parser("status", help="Print status counts and score distribution")
+    _add_input_arg(p_status)
+    p_status.set_defaults(func=cmd_status)
+
+    p_export = sub.add_parser("export", help="Write the clean passed-only dataset to data/")
+    _add_input_arg(p_export)
+    p_export.set_defaults(func=cmd_export)
 
     args = parser.parse_args()
     args.func(args)

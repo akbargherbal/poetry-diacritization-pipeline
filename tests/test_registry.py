@@ -86,6 +86,39 @@ def test_build_registry_from_input_raises_on_duplicate_verse_id(fake_input_pickl
         registry.build_registry_from_input(path)
 
 
+def test_build_registry_from_input_auto_detects_renamed_pickle(
+    monkeypatch, tmp_path, fake_input_pickle
+):
+    """Regression test: swapping data/SAMPLE_POEMS.pkl for a differently
+    named pickle (e.g. data/SAMPLE_100_BATCHES.pkl) used to crash with
+    FileNotFoundError because the old default was bound to
+    config.INPUT_PICKLE at import time. It should now be auto-detected.
+    """
+    data_dir = tmp_path / "data"
+    data_dir.mkdir(exist_ok=True)
+    monkeypatch.setattr(config, "BASE_DIR", str(tmp_path))
+    monkeypatch.setattr(config, "INPUT_PICKLE", str(data_dir / "SAMPLE_POEMS.pkl"))
+    monkeypatch.delenv(config.INPUT_PICKLE_ENV_VAR, raising=False)
+
+    # fake_input_pickle writes into tmp_path (its own tmp_path fixture),
+    # so build it there and copy into our isolated data_dir under a
+    # different name than the historical default.
+    src_path = fake_input_pickle(
+        [
+            {
+                "poem_no": 1,
+                "meter": "wafer",
+                "verses": [{"verse_id": "1_001", "sadr": "a", "ajuz": "b"}],
+            }
+        ]
+    )
+    renamed = data_dir / "SAMPLE_100_BATCHES.pkl"
+    renamed.write_bytes(open(src_path, "rb").read())
+
+    df = registry.build_registry_from_input()  # no path given -> auto-detect
+    assert len(df) == 1
+
+
 # ---------------------------------------------------------------------------
 # load_or_build_registry
 # ---------------------------------------------------------------------------

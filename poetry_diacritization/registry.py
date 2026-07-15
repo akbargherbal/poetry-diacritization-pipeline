@@ -52,8 +52,25 @@ REGISTRY_COLUMNS = [
 _save_lock = threading.Lock()
 
 
-def build_registry_from_input(input_pickle_path: str = config.INPUT_PICKLE) -> pd.DataFrame:
-    """Explode the batch-level input pickle into a flat, verse-level registry."""
+def build_registry_from_input(input_pickle_path: str = None) -> pd.DataFrame:
+    """Explode the batch-level input pickle into a flat, verse-level registry.
+
+    `input_pickle_path`, if given, is used as-is. Otherwise it's resolved
+    via config.resolve_input_pickle() at *call* time (not import time --
+    binding straight to config.INPUT_PICKLE in the signature was the bug
+    that made swapping in a differently-named pickle crash with a
+    FileNotFoundError instead of picking it up).
+    """
+    input_pickle_path = config.resolve_input_pickle(input_pickle_path)
+    if not os.path.isfile(input_pickle_path):
+        raise FileNotFoundError(
+            f"Input pickle not found: {input_pickle_path}\n"
+            f"Put your batch-level DataFrame pickle in "
+            f"{os.path.join(config.BASE_DIR, 'data')}/ (it will be "
+            "auto-detected if it's the only .pkl there), or point at it "
+            "explicitly with --input path/to/your.pkl, or set "
+            f"{config.INPUT_PICKLE_ENV_VAR}=path/to/your.pkl."
+        )
     src = pd.read_pickle(input_pickle_path)
 
     rows = []
@@ -113,13 +130,17 @@ def _ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def load_or_build_registry() -> pd.DataFrame:
+def load_or_build_registry(input_pickle_path: str = None) -> pd.DataFrame:
     if os.path.exists(config.REGISTRY_PATH):
         df = pd.read_pickle(config.REGISTRY_PATH)
         df = _ensure_columns(df)
         log.info(f"Loaded existing registry with {len(df)} verses from {config.REGISTRY_PATH}")
         return df
-    df = build_registry_from_input()
+    df = (
+        build_registry_from_input(input_pickle_path)
+        if input_pickle_path is not None
+        else build_registry_from_input()
+    )
     save_registry(df)
     return df
 
