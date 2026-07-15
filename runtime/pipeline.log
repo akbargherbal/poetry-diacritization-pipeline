@@ -33,3 +33,11 @@
 2026-07-15 10:43:36,229 - INFO - Call 576831f9954a: validated 12 verses
 2026-07-15 10:43:36,229 - INFO - Threshold 0.9: 64 newly passed, 6 marked failed_prosody
 2026-07-15 10:43:36,229 - INFO - Loaded existing registry with 76 verses from C:\Users\DELL\Jupyter_Notebooks\poetry-diacritization-pipeline\runtime\registry.pkl
+2026-07-15 11:15:38,577 - INFO - Loaded existing registry with 76 verses from C:\Users\DELL\Jupyter_Notebooks\poetry-diacritization-pipeline\runtime\registry.pkl
+2026-07-15 11:15:38,581 - INFO - Reset 6 verse(s) for revalidation from ['failed_text_mismatch', 'failed_parse']
+2026-07-15 11:15:38,581 - INFO - Validating 6 verses across 4 raw responses
+2026-07-15 11:15:38,706 - INFO - Call c609e24788c0: validated 2 verses
+2026-07-15 11:15:38,706 - INFO - Call 6a5185e2f573: validated 2 verses
+2026-07-15 11:15:38,706 - INFO - Call 56b3b29e0010: validated 1 verses
+2026-07-15 11:15:38,706 - INFO - Call ffc1c35fd391: validated 1 verses
+2026-07-15 11:15:38,713 - INFO - Loaded existing registry with 76 verses from C:\Users\DELL\Jupyter_Notebooks\poetry-diacritization-pipeline\runtime\registry.pkl

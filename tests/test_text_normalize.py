@@ -46,6 +46,36 @@ def test_teh_marbuta_not_normalized_when_flag_off(monkeypatch):
     assert normalize("مدرسة") != normalize("مدرسه")
 
 
+@pytest.mark.parametrize(
+    "with_alef_maksura, with_yeh",
+    [
+        ("للذى", "للذي"),
+        ("يشتهى", "يشتهي"),
+    ],
+)
+def test_alef_maksura_normalized_when_flag_on(monkeypatch, with_alef_maksura, with_yeh):
+    monkeypatch.setattr(text_normalize, "NORMALIZE_ALEF_MAKSURA", True)
+    assert normalize(with_alef_maksura) == normalize(with_yeh)
+
+
+def test_alef_maksura_not_normalized_when_flag_off():
+    with_alef_maksura, with_yeh = "للذى", "للذي"
+    original = text_normalize.NORMALIZE_ALEF_MAKSURA
+    text_normalize.NORMALIZE_ALEF_MAKSURA = False
+    try:
+        assert normalize(with_alef_maksura) != normalize(with_yeh)
+    finally:
+        text_normalize.NORMALIZE_ALEF_MAKSURA = original
+
+
+def test_alef_maksura_does_not_collapse_into_plain_alef():
+    # Regression guard: alef maqsura must resolve to yeh (ي), not to plain
+    # alef (ا) via normalize_alef, or it becomes indistinguishable from a
+    # genuinely different word ending in ا.
+    assert normalize("للذى") == normalize("للذي")
+    assert normalize("للذى") != normalize("للذا")
+
+
 def test_whitespace_collapses():
     assert normalize("كلمة    أخرى") == normalize("كلمة أخرى")
     # NORMALIZE_TEH is on by default, so compare against normalize() of the

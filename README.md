@@ -170,9 +170,14 @@ candidate, for debugging.
   — safe to re-run with a new cutoff anytime; add `--include-rescored` to
   also re-evaluate verses that were previously marked `failed_prosody`
   under an older cutoff.
-- **Re-check fidelity rules**: edit `NORMALIZE_TEH` or the `normalize()`
-  pipeline in `text_normalize.py`, then just re-run `validate` — no API
-  calls needed, since `sadr_current`/`ajuz_current` are already saved.
+- **Re-check fidelity rules**: edit `NORMALIZE_TEH`, `NORMALIZE_ALEF_MAKSURA`,
+  or the `normalize()` pipeline in `text_normalize.py`, then run
+  `python run.py revalidate` — no API calls needed. This resets any
+  `failed_text_mismatch` / `failed_parse` verse back to
+  `awaiting_validation` and re-parses its already-saved raw response
+  (`runtime/raw_responses/<call_id>.txt`) under the current code. Pass
+  `--statuses failed_prosody` (or any combination) to widen what gets
+  re-checked. Safe to run repeatedly.
 
 ## Known limitations / things to watch
 

@@ -6,7 +6,7 @@ from .export import export_passed
 from .generate import run_generation_pass
 from .registry import load_or_build_registry, status_counts
 from .threshold import apply_threshold, score_distribution
-from .validate import run_validation_pass
+from .validate import reset_for_revalidation, run_validation_pass
 
 
 def _setup_logging():
@@ -45,6 +45,19 @@ def cmd_generate(args):
 
 def cmd_validate(args):
     df = load_or_build_registry()
+    run_validation_pass(df)
+    cmd_status(args)
+
+
+def cmd_revalidate(args):
+    df = load_or_build_registry()
+    df, reset_ids, skipped_ids = reset_for_revalidation(df, statuses=tuple(args.statuses))
+    if not reset_ids:
+        print(f"Nothing to revalidate (no rows in {list(args.statuses)} with a saved raw response).")
+        if skipped_ids:
+            print(f"{len(skipped_ids)} row(s) in that status have no saved raw response, skipped: {skipped_ids}")
+        return
+    print(f"Revalidating {len(reset_ids)} verse(s), offline (no LLM calls): {reset_ids}")
     run_validation_pass(df)
     cmd_status(args)
 
@@ -132,6 +145,19 @@ def main():
     sub.add_parser("validate", help="Parse + check fidelity + score with pyarud, offline").set_defaults(
         func=cmd_validate
     )
+
+    p_revalidate = sub.add_parser(
+        "revalidate",
+        help="Re-check failed_text_mismatch/failed_parse verses against current code, "
+        "offline (no LLM calls) — for after editing normalize() or the parser",
+    )
+    p_revalidate.add_argument(
+        "--statuses",
+        nargs="+",
+        default=["failed_text_mismatch", "failed_parse"],
+        help="Which status(es) to reset and re-check (default: %(default)s)",
+    )
+    p_revalidate.set_defaults(func=cmd_revalidate)
 
     p_threshold = sub.add_parser("threshold", help="Turn stored pyarud scores into passed/failed")
     p_threshold.add_argument("--cutoff", type=float, default=0.90)

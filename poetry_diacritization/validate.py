@@ -90,6 +90,45 @@ def _score_with_pyarud(sadr: str, ajuz: str, meter: str):
         return None, None, str(e)
 
 
+def reset_for_revalidation(df, statuses=("failed_text_mismatch", "failed_parse")):
+    """
+    Send rows back through run_validation_pass without calling the LLM
+    again — for when you've changed normalize() or the parsing logic and
+    want to see whether previously-failed verses now pass, using the raw
+    response already saved on disk.
+
+    Only rows with a `last_call_id` are eligible: that's what points at
+    the saved runtime/raw_responses/<call_id>.txt file run_validation_pass
+    needs. A row with no last_call_id has never actually been generated
+    (e.g. still 'pending') — resetting it here would be a no-op at best,
+    so it's left alone; it'll get picked up by the next `generate` pass
+    instead, same as always.
+
+    `failed_prosody` is deliberately NOT in the default statuses: those
+    verses already passed the fidelity check and got a real pyarud score
+    — re-parsing the same raw response can't change that outcome, so
+    that's threshold.py's job (its `include_rescored` flag), not this
+    function's.
+
+    Safe to call repeatedly / after any code change: it only ever moves
+    rows *into* 'awaiting_validation', never invents new LLM output.
+    """
+    eligible = df["status"].isin(statuses) & df["last_call_id"].notna()
+    skipped = df["status"].isin(statuses) & df["last_call_id"].isna()
+
+    reset_ids = df.index[eligible].tolist()
+    skipped_ids = df.index[skipped].tolist()
+
+    df.loc[eligible, "status"] = "awaiting_validation"
+
+    log.info(
+        f"Reset {len(reset_ids)} verse(s) for revalidation from {list(statuses)}"
+        + (f"; skipped {len(skipped_ids)} with no saved raw response" if skipped_ids else "")
+    )
+    save_registry(df)
+    return df, reset_ids, skipped_ids
+
+
 def run_validation_pass(df):
     pending = df[df["status"] == "awaiting_validation"]
     if pending.empty:
@@ -134,8 +173,8 @@ def run_validation_pass(df):
             df.loc[verse_id, "sadr_current"] = sadr_candidate
             df.loc[verse_id, "ajuz_current"] = ajuz_candidate
 
-            sadr_ok = normalize(sadr_candidate) == row["sadr_norm"]
-            ajuz_ok = normalize(ajuz_candidate) == row["ajuz_norm"]
+            sadr_ok = normalize(sadr_candidate) == normalize(row["sadr_raw"])
+            ajuz_ok = normalize(ajuz_candidate) == normalize(row["ajuz_raw"])
 
             if not (sadr_ok and ajuz_ok):
                 df.loc[verse_id, "status"] = "failed_text_mismatch"

@@ -4,7 +4,7 @@ import os
 import pytest
 
 from poetry_diacritization import config, validate
-from poetry_diacritization.validate import _parse_llm_json, _score_with_pyarud, run_validation_pass
+from poetry_diacritization.validate import _parse_llm_json, _score_with_pyarud, reset_for_revalidation, run_validation_pass
 
 
 # ---------------------------------------------------------------------------
@@ -269,3 +269,99 @@ def test_run_validation_pass_shares_one_call_id_across_verses_parses_once(monkey
     run_validation_pass(df)
 
     assert len(parse_calls) == 1  # parsed once for both verses, not twice
+
+
+def test_fidelity_check_uses_raw_text_not_stale_cached_norm(monkeypatch, make_registry_df):
+    """Regression test: sadr_norm/ajuz_norm are a build-time cache. If
+    normalize() changes later (e.g. a new equivalence rule), a row's
+    cached norm column can go stale while sadr_raw never does. The
+    fidelity check must always re-derive truth from sadr_raw/ajuz_raw,
+    not trust the cached column, or fixing normalize() wouldn't actually
+    fix anything for verses already in the registry.
+    """
+    df = make_registry_df(
+        [{"verse_id": "1_001", "status": "awaiting_validation", "last_call_id": "call1",
+          "sadr_raw": "كلمة", "ajuz_raw": "أخرى"}]
+    )
+    # Simulate a stale cache: sadr_norm disagrees with normalize(sadr_raw).
+    df.loc["1_001", "sadr_norm"] = "this is not what normalize(sadr_raw) returns"
+
+    _write_raw_response("call1", [{"id": "1_001", "sadr": "كَلِمَة", "ajuz": "أُخْرَى"}])
+    monkeypatch.setattr(
+        validate, "_score_with_pyarud", lambda sadr, ajuz, meter: (0.9, {}, None)
+    )
+
+    result = run_validation_pass(df)
+
+    assert result.loc["1_001", "status"] == "scored"
+
+
+# ---------------------------------------------------------------------------
+# reset_for_revalidation
+# ---------------------------------------------------------------------------
+
+
+def test_reset_for_revalidation_moves_eligible_rows_to_awaiting_validation(make_registry_df):
+    df = make_registry_df(
+        [{"verse_id": "1_001", "status": "failed_text_mismatch", "last_call_id": "call1"}]
+    )
+    df, reset_ids, skipped_ids = reset_for_revalidation(df)
+    assert reset_ids == ["1_001"]
+    assert skipped_ids == []
+    assert df.loc["1_001", "status"] == "awaiting_validation"
+
+
+def test_reset_for_revalidation_skips_rows_with_no_saved_call_id(make_registry_df):
+    df = make_registry_df(
+        [{"verse_id": "1_001", "status": "failed_text_mismatch", "last_call_id": None}]
+    )
+    df, reset_ids, skipped_ids = reset_for_revalidation(df)
+    assert reset_ids == []
+    assert skipped_ids == ["1_001"]
+    assert df.loc["1_001", "status"] == "failed_text_mismatch"  # untouched
+
+
+def test_reset_for_revalidation_ignores_other_statuses_by_default(make_registry_df):
+    df = make_registry_df(
+        [
+            {"verse_id": "1_001", "status": "failed_prosody", "last_call_id": "call1"},
+            {"verse_id": "1_002", "status": "passed", "last_call_id": "call2"},
+        ]
+    )
+    df, reset_ids, skipped_ids = reset_for_revalidation(df)
+    assert reset_ids == []
+    assert df.loc["1_001", "status"] == "failed_prosody"
+    assert df.loc["1_002", "status"] == "passed"
+
+
+def test_reset_for_revalidation_respects_custom_statuses(make_registry_df):
+    df = make_registry_df(
+        [{"verse_id": "1_001", "status": "failed_prosody", "last_call_id": "call1"}]
+    )
+    df, reset_ids, skipped_ids = reset_for_revalidation(df, statuses=("failed_prosody",))
+    assert reset_ids == ["1_001"]
+    assert df.loc["1_001", "status"] == "awaiting_validation"
+
+
+def test_reset_for_revalidation_end_to_end_rescues_normalize_fix(monkeypatch, make_registry_df):
+    """The actual scenario this feature exists for: a verse failed
+    text_mismatch under an older normalize(), the code got fixed, and
+    revalidating (no new LLM call) now lets it through.
+    """
+    df = make_registry_df(
+        [{"verse_id": "1_001", "status": "failed_text_mismatch", "last_call_id": "call1",
+          "sadr_raw": "للذى ظل", "ajuz_raw": "في كفاح"}]
+    )
+    # The LLM's original (already-saved) answer used a dotted yeh where the
+    # source used alef maqsura — exactly the ى/ي case NORMALIZE_ALEF_MAKSURA
+    # covers.
+    _write_raw_response("call1", [{"id": "1_001", "sadr": "لِلَّذِي ظَلَّ", "ajuz": "فِي كِفَاحٍ"}])
+    monkeypatch.setattr(
+        validate, "_score_with_pyarud", lambda sadr, ajuz, meter: (0.95, {}, None)
+    )
+
+    df, reset_ids, _ = reset_for_revalidation(df)
+    assert reset_ids == ["1_001"]
+
+    result = run_validation_pass(df)
+    assert result.loc["1_001", "status"] == "scored"
