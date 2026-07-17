@@ -5,14 +5,14 @@
     "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "poetry_diacritization/cli.py": {
-    "mtime": 1784279237.6794221,
-    "ast_hash": "5a5fa1ac426f6b6711d0daa126fb863f",
-    "semantic_hash": "5a5fa1ac426f6b6711d0daa126fb863f"
+    "mtime": 1784295874.7174265,
+    "ast_hash": "9345734bd52ff0ce5712caa2b6a54dc4",
+    "semantic_hash": "9345734bd52ff0ce5712caa2b6a54dc4"
   },
   "poetry_diacritization/config.py": {
-    "mtime": 1784279237.6794221,
-    "ast_hash": "88db6fab3b82b4b0c38f8a48d968a91b",
-    "semantic_hash": "88db6fab3b82b4b0c38f8a48d968a91b"
+    "mtime": 1784295874.7174265,
+    "ast_hash": "6b088d8122599d2bb91cc5b9df21ec3a",
+    "semantic_hash": "6b088d8122599d2bb91cc5b9df21ec3a"
   },
   "poetry_diacritization/export.py": {
     "mtime": 1784103864.5154893,
@@ -20,19 +20,19 @@
     "semantic_hash": "c890d26d0faba4d4cc5b2ab06f91fe8c"
   },
   "poetry_diacritization/generate.py": {
-    "mtime": 1784107722.23598,
-    "ast_hash": "0ebb29ccf27714b9dbdc554e881616a2",
-    "semantic_hash": "0ebb29ccf27714b9dbdc554e881616a2"
+    "mtime": 1784295874.7174265,
+    "ast_hash": "3a91b51754c33029415d6182f2577f4d",
+    "semantic_hash": "3a91b51754c33029415d6182f2577f4d"
   },
   "poetry_diacritization/llm_client.py": {
-    "mtime": 1784107722.23598,
-    "ast_hash": "792b44c5ce7add778c62b937d525d6b5",
-    "semantic_hash": "792b44c5ce7add778c62b937d525d6b5"
+    "mtime": 1784295874.7174265,
+    "ast_hash": "fa2720ec3f1f16450ca7340d0e525ade",
+    "semantic_hash": "fa2720ec3f1f16450ca7340d0e525ade"
   },
   "poetry_diacritization/registry.py": {
-    "mtime": 1784279237.6794221,
-    "ast_hash": "0cbd8091ba8d4338b3d57512ca6e72b7",
-    "semantic_hash": "0cbd8091ba8d4338b3d57512ca6e72b7"
+    "mtime": 1784295874.7174265,
+    "ast_hash": "ad4efa363517d8265ca8412a3baf80a9",
+    "semantic_hash": "ad4efa363517d8265ca8412a3baf80a9"
   },
   "poetry_diacritization/text_normalize.py": {
     "mtime": 1784103864.5154893,
@@ -55,14 +55,14 @@
     "semantic_hash": "bd8a006181a85ebba4d56468eec3768d"
   },
   "tests/conftest.py": {
-    "mtime": 1784107722.23598,
-    "ast_hash": "0b70c88eb00152778811667be302fbf2",
-    "semantic_hash": "0b70c88eb00152778811667be302fbf2"
+    "mtime": 1784295874.7200458,
+    "ast_hash": "15f7d14cdba4d32b0821b8cd2da1f29d",
+    "semantic_hash": "15f7d14cdba4d32b0821b8cd2da1f29d"
   },
   "tests/test_cli.py": {
-    "mtime": 1784279237.6794221,
-    "ast_hash": "b5ba17dfbf42f175770cac175d7bf5cd",
-    "semantic_hash": "b5ba17dfbf42f175770cac175d7bf5cd"
+    "mtime": 1784295874.7200458,
+    "ast_hash": "1ba5b9702ec34f9dc1bde3ef33a9aa35",
+    "semantic_hash": "1ba5b9702ec34f9dc1bde3ef33a9aa35"
   },
   "tests/test_export.py": {
     "mtime": 1784103864.516356,
@@ -70,9 +70,9 @@
     "semantic_hash": "e72be8150981f1f1f3872fe8d8fe53dd"
   },
   "tests/test_generate.py": {
-    "mtime": 1784107722.23598,
-    "ast_hash": "bd0710911627fe77d997df586a2e1027",
-    "semantic_hash": "bd0710911627fe77d997df586a2e1027"
+    "mtime": 1784295874.7200458,
+    "ast_hash": "48e53b761155863968d43ff5b39c7e97",
+    "semantic_hash": "48e53b761155863968d43ff5b39c7e97"
   },
   "tests/test_integration_llm.py": {
     "mtime": 1784107722.23598,
@@ -80,14 +80,14 @@
     "semantic_hash": "5f9e46177749f9c8f5d3661e462c6eba"
   },
   "tests/test_llm_client.py": {
-    "mtime": 1784107722.23598,
-    "ast_hash": "7aac66339543913196e850ba74e8b8cd",
-    "semantic_hash": "7aac66339543913196e850ba74e8b8cd"
+    "mtime": 1784295874.7200458,
+    "ast_hash": "fa1b7e9f8550e10060a5846c0b1ba5e7",
+    "semantic_hash": "fa1b7e9f8550e10060a5846c0b1ba5e7"
   },
   "tests/test_registry.py": {
-    "mtime": 1784279237.6794221,
-    "ast_hash": "4eb97c07c54eb00b09233fe6170d0709",
-    "semantic_hash": "4eb97c07c54eb00b09233fe6170d0709"
+    "mtime": 1784295874.7200458,
+    "ast_hash": "11117223ef0d77ceace7f9c18890f5c7",
+    "semantic_hash": "11117223ef0d77ceace7f9c18890f5c7"
   },
   "tests/test_text_normalize.py": {
     "mtime": 1784103864.516356,
@@ -158,5 +158,15 @@
     "mtime": 1784280205.6193004,
     "ast_hash": "0bc020d491fca99550c1ea3de0a5f862",
     "semantic_hash": "0bc020d491fca99550c1ea3de0a5f862"
+  },
+  "poetry_diacritization/git_checkpoint.py": {
+    "mtime": 1784295874.7174265,
+    "ast_hash": "c7ca795ddafd199657892bc1ec7de99a",
+    "semantic_hash": "c7ca795ddafd199657892bc1ec7de99a"
+  },
+  "tests/test_git_checkpoint.py": {
+    "mtime": 1784295874.7200458,
+    "ast_hash": "2b564aa9af15a6dd0548e3b05957aa55",
+    "semantic_hash": "2b564aa9af15a6dd0548e3b05957aa55"
   }
 }
