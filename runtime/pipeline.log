@@ -1,0 +1,277 @@
+2026-07-17 12:53:39,087 - INFO - Built fresh registry with 1013 verses from /content/poetry-diacritization-pipeline/data/SAMPLE_100_BATCHES.pkl
+2026-07-17 12:54:32,330 - INFO - HTTP Request: GET https://integrate.api.nvidia.com/v1/models "HTTP/1.1 200 OK"
+2026-07-17 12:54:32,335 - INFO - NVIDIA API authentication successful.
+2026-07-17 12:54:32,707 - INFO - Built 100 batches covering 1013 pending verses
+2026-07-17 12:54:36,447 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 12:54:36,449 - INFO - Retrying request to /chat/completions in 0.422441 seconds
+2026-07-17 12:54:37,829 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 12:54:37,830 - INFO - Retrying request to /chat/completions in 0.846987 seconds
+2026-07-17 12:54:44,239 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:54:44,251 - WARNING - No DeepSeek pricing entry for model 'deepseek-ai/deepseek-v4-flash' — cost left as None for this call. Add it to pricing_config.py to track spend on it.
+2026-07-17 12:54:44,265 - INFO - Poem 106135: got response for 1 verses (call 04de103df2c4)
+2026-07-17 12:54:56,624 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:54:56,635 - INFO - Poem 10327: got response for 10 verses (call 2c55a7209d02)
+2026-07-17 12:55:33,002 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 12:55:33,002 - INFO - Retrying request to /chat/completions in 0.415210 seconds
+2026-07-17 12:55:49,331 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:55:49,342 - INFO - Poem 13009: got response for 12 verses (call 1819bd2b07a2)
+2026-07-17 12:56:05,349 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:56:05,360 - INFO - Poem 101894: got response for 11 verses (call 751a3bd5f37e)
+2026-07-17 12:56:05,484 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 12:56:05,485 - INFO - Retrying request to /chat/completions in 0.428984 seconds
+2026-07-17 12:56:06,071 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:56:06,082 - INFO - Poem 10033: got response for 12 verses (call d09197da02d8)
+2026-07-17 12:56:06,205 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 12:56:06,206 - INFO - Retrying request to /chat/completions in 0.485477 seconds
+2026-07-17 12:56:07,128 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:56:07,139 - INFO - Poem 11121: got response for 12 verses (call 44a21c21e246)
+2026-07-17 12:56:10,788 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:56:10,802 - INFO - Poem 132015: got response for 12 verses (call 5043480e265f)
+2026-07-17 12:56:28,374 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:56:28,385 - INFO - Poem 132603: got response for 10 verses (call 6c83373be81a)
+2026-07-17 12:56:37,395 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:56:37,406 - INFO - Poem 16947: got response for 4 verses (call bb596ce126ee)
+2026-07-17 12:56:38,072 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:56:38,083 - INFO - Poem 132637: got response for 12 verses (call 2c638a5098f2)
+2026-07-17 12:56:52,662 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:56:52,672 - INFO - Poem 132702: got response for 12 verses (call 31a4a13829de)
+2026-07-17 12:56:57,244 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:56:57,255 - INFO - Poem 142: got response for 12 verses (call b7465ebfcfb3)
+2026-07-17 12:57:31,230 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:57:31,243 - INFO - Poem 158000: got response for 12 verses (call c172f01ffbc5)
+2026-07-17 12:57:34,876 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:57:34,892 - INFO - Poem 171278: got response for 6 verses (call 0e1b87db9aff)
+2026-07-17 12:57:43,297 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:57:43,310 - INFO - Poem 2045: got response for 4 verses (call b7c596bebc34)
+2026-07-17 12:57:46,755 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:57:46,774 - INFO - Poem 132868: got response for 12 verses (call 47b4831d8282)
+2026-07-17 12:57:59,150 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:57:59,166 - INFO - Poem 185700: got response for 12 verses (call d52a0a745a66)
+2026-07-17 12:57:59,227 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:57:59,243 - INFO - Poem 171464: got response for 12 verses (call f787d839587d)
+2026-07-17 12:58:06,911 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:58:06,924 - INFO - Poem 174618: got response for 12 verses (call 6e4f7dafae1e)
+2026-07-17 12:58:31,670 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:58:31,682 - INFO - Poem 22132: got response for 7 verses (call 4be67804b433)
+2026-07-17 12:58:32,282 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:58:32,293 - INFO - Poem 21802: got response for 12 verses (call 593e7e3819c3)
+2026-07-17 12:58:35,257 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 12:58:35,258 - INFO - Retrying request to /chat/completions in 0.475493 seconds
+2026-07-17 12:58:37,294 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 12:58:37,294 - INFO - Retrying request to /chat/completions in 0.916315 seconds
+2026-07-17 12:58:39,647 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:58:39,659 - INFO - Poem 25425: got response for 1 verses (call ed5f12c840c3)
+2026-07-17 12:58:41,169 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:58:41,180 - INFO - Poem 2444: got response for 9 verses (call 028368ad5c6c)
+2026-07-17 12:58:48,259 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:58:48,274 - INFO - Poem 1909: got response for 12 verses (call 7d05bf62cab6)
+2026-07-17 12:58:49,338 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:58:49,349 - INFO - Poem 22003: got response for 12 verses (call c97aab263b0f)
+2026-07-17 12:58:49,769 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 12:58:49,770 - INFO - Retrying request to /chat/completions in 0.478411 seconds
+2026-07-17 12:58:50,375 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 12:58:50,376 - INFO - Retrying request to /chat/completions in 0.845079 seconds
+2026-07-17 12:59:11,270 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:59:11,284 - INFO - Poem 25113: got response for 12 verses (call 9ef69959e559)
+2026-07-17 12:59:16,228 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:59:16,239 - INFO - Poem 26834: got response for 4 verses (call 4876790415b8)
+2026-07-17 12:59:25,245 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:59:25,256 - INFO - Poem 27436: got response for 12 verses (call aed7056d494d)
+2026-07-17 12:59:33,652 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:59:33,665 - INFO - Poem 25108: got response for 12 verses (call 3bb01cf86f97)
+2026-07-17 12:59:43,943 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 12:59:43,957 - INFO - Poem 27419: got response for 12 verses (call ac62ce55738f)
+2026-07-17 13:00:05,975 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:00:05,975 - INFO - Retrying request to /chat/completions in 0.428020 seconds
+2026-07-17 13:00:06,557 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:00:06,557 - INFO - Retrying request to /chat/completions in 0.775907 seconds
+2026-07-17 13:00:06,669 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:00:06,670 - INFO - Retrying request to /chat/completions in 0.425921 seconds
+2026-07-17 13:00:07,217 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:00:07,217 - INFO - Retrying request to /chat/completions in 0.805230 seconds
+2026-07-17 13:00:07,456 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:00:07,457 - ERROR - LLM call failed for poem batch: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (138/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:00:07,458 - WARNING - Batch for poem 27417 (['27417_060', '27417_061', '27417_062', '27417_063', '27417_064', '27417_065', '27417_066', '27417_067', '27417_068', '27417_069', '27417_070', '27417_071']) failed: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (138/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:00:08,174 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:00:08,175 - ERROR - LLM call failed for poem batch: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (58/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:00:08,175 - WARNING - Batch for poem 27703 (['27703_060', '27703_061', '27703_062', '27703_063', '27703_064', '27703_065', '27703_066', '27703_067', '27703_068', '27703_069', '27703_070', '27703_071']) failed: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (58/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:00:15,747 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:00:15,758 - INFO - Poem 29173: got response for 10 verses (call c1b26eea7d76)
+2026-07-17 13:00:26,645 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:00:26,655 - INFO - Poem 29388: got response for 12 verses (call 588e4f5f340c)
+2026-07-17 13:00:33,630 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:00:33,630 - INFO - Retrying request to /chat/completions in 0.416818 seconds
+2026-07-17 13:00:34,911 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:00:34,921 - INFO - Poem 29234: got response for 12 verses (call 897928a8d6d1)
+2026-07-17 13:00:43,075 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:00:43,087 - INFO - Poem 3034: got response for 7 verses (call b23f2dacfe92)
+2026-07-17 13:00:48,628 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:00:48,645 - INFO - Poem 30807: got response for 12 verses (call 38c70e031550)
+2026-07-17 13:01:00,874 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:01:00,889 - INFO - Poem 30769: got response for 12 verses (call 37e89593803e)
+2026-07-17 13:01:34,110 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:01:34,110 - INFO - Retrying request to /chat/completions in 0.486201 seconds
+2026-07-17 13:01:44,253 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:01:44,267 - INFO - Poem 31726: got response for 4 verses (call d17a16b9fc36)
+2026-07-17 13:01:47,650 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:01:47,664 - INFO - Poem 31583: got response for 12 verses (call aa46630bd9d2)
+2026-07-17 13:02:06,317 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:02:06,317 - INFO - Retrying request to /chat/completions in 0.452750 seconds
+2026-07-17 13:02:07,383 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:02:07,396 - INFO - Poem 3151: got response for 12 verses (call 74d53bdeb09d)
+2026-07-17 13:02:16,040 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:02:16,051 - INFO - Poem 3113: got response for 12 verses (call be1923b2a027)
+2026-07-17 13:02:16,213 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:02:16,214 - INFO - Retrying request to /chat/completions in 0.403279 seconds
+2026-07-17 13:02:26,713 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:02:26,724 - INFO - Poem 29518: got response for 12 verses (call 6e97a54eca54)
+2026-07-17 13:02:31,973 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:02:31,994 - INFO - Poem 32197: got response for 12 verses (call f82e16d1e529)
+2026-07-17 13:02:36,972 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:02:37,001 - INFO - Poem 32843: got response for 12 verses (call d9ab3c1abf29)
+2026-07-17 13:03:06,008 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:03:06,022 - INFO - Poem 32844: got response for 12 verses (call 02f186eba72c)
+2026-07-17 13:03:10,973 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:03:10,992 - INFO - Poem 33041: got response for 12 verses (call 3c5044ed1043)
+2026-07-17 13:03:24,082 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:03:24,099 - INFO - Poem 34777: got response for 12 verses (call e3e28b08f6cd)
+2026-07-17 13:03:29,036 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:03:29,047 - INFO - Poem 33106: got response for 12 verses (call 24d4cb495445)
+2026-07-17 13:03:29,759 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:03:29,771 - INFO - Poem 32934: got response for 12 verses (call 6c873484edd0)
+2026-07-17 13:03:33,278 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:03:33,288 - INFO - Poem 384: got response for 7 verses (call 3457b23eda48)
+2026-07-17 13:03:35,701 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:03:35,701 - INFO - Retrying request to /chat/completions in 0.435366 seconds
+2026-07-17 13:03:36,270 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:03:36,271 - INFO - Retrying request to /chat/completions in 0.813870 seconds
+2026-07-17 13:03:37,255 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:03:37,256 - ERROR - LLM call failed for poem batch: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (98/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:03:37,256 - WARNING - Batch for poem 39946 (['39946_000', '39946_001', '39946_002', '39946_003', '39946_004', '39946_005', '39946_006', '39946_007', '39946_008', '39946_009', '39946_010', '39946_011']) failed: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (98/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:03:53,334 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:03:53,346 - INFO - Poem 3519: got response for 12 verses (call 1da45a61e3b3)
+2026-07-17 13:03:55,772 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:03:55,783 - INFO - Poem 42262: got response for 2 verses (call 653f41d6f887)
+2026-07-17 13:04:06,396 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:04:06,397 - INFO - Retrying request to /chat/completions in 0.427723 seconds
+2026-07-17 13:04:06,991 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:04:06,992 - INFO - Retrying request to /chat/completions in 0.973045 seconds
+2026-07-17 13:04:08,081 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:04:08,093 - INFO - Poem 39352: got response for 12 verses (call 638be7d06818)
+2026-07-17 13:04:08,101 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:04:08,102 - ERROR - LLM call failed for poem batch: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (360/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:04:08,102 - WARNING - Batch for poem 39651 (['39651_000', '39651_001', '39651_002', '39651_003', '39651_004', '39651_005', '39651_006', '39651_007', '39651_008', '39651_009', '39651_010', '39651_011']) failed: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (360/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:04:14,916 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:04:14,928 - INFO - Poem 3791: got response for 12 verses (call a3546c244d1c)
+2026-07-17 13:04:37,009 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:04:37,025 - INFO - Poem 42135: got response for 12 verses (call a79a7db854aa)
+2026-07-17 13:04:39,367 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:04:39,380 - INFO - Poem 52172: got response for 1 verses (call a1539d72e1d7)
+2026-07-17 13:04:44,443 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:04:44,455 - INFO - Poem 56228: got response for 4 verses (call f1f9a96fe1d3)
+2026-07-17 13:04:52,045 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:04:52,056 - INFO - Poem 47445: got response for 6 verses (call e1d38894d516)
+2026-07-17 13:05:00,500 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:05:00,517 - INFO - Poem 47258: got response for 7 verses (call 11cce8d78a11)
+2026-07-17 13:05:06,509 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:05:06,510 - INFO - Retrying request to /chat/completions in 0.452449 seconds
+2026-07-17 13:05:07,117 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:05:07,118 - INFO - Retrying request to /chat/completions in 0.803999 seconds
+2026-07-17 13:05:08,079 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:05:08,080 - ERROR - LLM call failed for poem batch: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (48/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:05:08,080 - WARNING - Batch for poem 58471 (['58471_012', '58471_013', '58471_014', '58471_015', '58471_016', '58471_017', '58471_018', '58471_019', '58471_020', '58471_021', '58471_022', '58471_023']) failed: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (48/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:05:23,057 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:05:23,067 - INFO - Poem 59281: got response for 8 verses (call 1c62403ba5f0)
+2026-07-17 13:05:24,664 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:05:24,665 - INFO - Retrying request to /chat/completions in 0.446807 seconds
+2026-07-17 13:05:34,233 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:05:34,245 - INFO - Poem 59243: got response for 1 verses (call 430fb284d2f5)
+2026-07-17 13:05:35,204 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:05:35,215 - INFO - Poem 59232: got response for 12 verses (call 3bb9e29f6f03)
+2026-07-17 13:05:36,790 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:05:36,790 - INFO - Retrying request to /chat/completions in 0.418479 seconds
+2026-07-17 13:06:06,518 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:06:06,519 - INFO - Retrying request to /chat/completions in 0.435088 seconds
+2026-07-17 13:06:07,075 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:06:07,076 - INFO - Retrying request to /chat/completions in 0.783948 seconds
+2026-07-17 13:06:11,505 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:06:11,506 - INFO - Retrying request to /chat/completions in 0.488840 seconds
+2026-07-17 13:06:12,151 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:06:12,151 - INFO - Retrying request to /chat/completions in 0.929202 seconds
+2026-07-17 13:06:13,277 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:06:13,278 - ERROR - LLM call failed for poem batch: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (123/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:06:13,278 - WARNING - Batch for poem 57202 (['57202_120', '57202_121', '57202_122', '57202_123', '57202_124', '57202_125', '57202_126', '57202_127', '57202_128', '57202_129', '57202_130', '57202_131']) failed: Error code: 503 - {'error': {'message': 'ResourceExhausted: Worker local total request limit reached (123/48)', 'type': 'Service Unavailable', 'code': 503}}
+2026-07-17 13:06:24,909 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:06:24,923 - INFO - Poem 62263: got response for 5 verses (call 837da9563801)
+2026-07-17 13:06:25,376 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:06:25,377 - INFO - Retrying request to /chat/completions in 0.491342 seconds
+2026-07-17 13:06:26,714 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:06:26,724 - INFO - Poem 59284: got response for 12 verses (call 7b2aeac0901c)
+2026-07-17 13:06:30,348 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:06:30,359 - INFO - Poem 59282: got response for 12 verses (call 436b9864621c)
+2026-07-17 13:06:34,510 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:06:34,523 - INFO - Poem 6250: got response for 12 verses (call b818117a749b)
+2026-07-17 13:06:54,335 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:06:54,345 - INFO - Poem 6256: got response for 12 verses (call 96fef21011af)
+2026-07-17 13:07:02,069 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:07:02,086 - INFO - Poem 65435: got response for 12 verses (call 318e43a15ca2)
+2026-07-17 13:07:11,684 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:07:11,685 - INFO - Retrying request to /chat/completions in 0.383895 seconds
+2026-07-17 13:07:14,376 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:07:14,391 - INFO - Poem 63814: got response for 12 verses (call a7307bca408b)
+2026-07-17 13:07:34,209 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 503 Service Unavailable"
+2026-07-17 13:07:34,210 - INFO - Retrying request to /chat/completions in 0.387553 seconds
+2026-07-17 13:07:39,809 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:07:39,819 - INFO - Poem 63970: got response for 2 verses (call a2c53597645f)
+2026-07-17 13:07:44,750 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:07:44,761 - INFO - Poem 65501: got response for 11 verses (call e87a06fc33c0)
+2026-07-17 13:07:51,583 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:07:51,594 - INFO - Poem 6191: got response for 12 verses (call 71de93c0e520)
+2026-07-17 13:07:54,541 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:07:54,554 - INFO - Poem 64943: got response for 4 verses (call 65ac8a81bedb)
+2026-07-17 13:08:05,296 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:08:05,307 - INFO - Poem 65466: got response for 12 verses (call 152cbe3881cf)
+2026-07-17 13:08:10,043 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:08:10,058 - INFO - Poem 65577: got response for 12 verses (call 20ba8a068828)
+2026-07-17 13:08:41,852 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:08:41,862 - INFO - Poem 65584: got response for 12 verses (call fa1cbf38987b)
+2026-07-17 13:09:11,232 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:09:11,243 - INFO - Poem 65672: got response for 12 verses (call 66dc6b16d5a8)
+2026-07-17 13:09:13,876 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:09:13,892 - INFO - Poem 65626: got response for 12 verses (call 380014657665)
+2026-07-17 13:09:17,584 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:09:17,596 - INFO - Poem 65837: got response for 12 verses (call 9f9801a403eb)
+2026-07-17 13:09:18,196 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:09:18,206 - INFO - Poem 65603: got response for 12 verses (call c4093c4f088d)
+2026-07-17 13:09:21,732 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:09:21,743 - INFO - Poem 65918: got response for 2 verses (call 1bd314393f9c)
+2026-07-17 13:09:39,002 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:09:39,021 - INFO - Poem 65632: got response for 12 verses (call 08c3e6cfc263)
+2026-07-17 13:09:41,402 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:09:41,415 - INFO - Poem 65900: got response for 12 verses (call d042ca2f00b2)
+2026-07-17 13:10:08,400 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:10:08,414 - INFO - Poem 66635: got response for 12 verses (call 527232f572f9)
+2026-07-17 13:10:13,495 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:10:13,522 - INFO - Poem 65994: got response for 12 verses (call 004d7c8f3160)
+2026-07-17 13:10:17,854 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:10:17,865 - INFO - Poem 69432: got response for 1 verses (call b29dea460bb6)
+2026-07-17 13:10:18,189 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:10:18,198 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:10:18,202 - INFO - Poem 66015: got response for 12 verses (call 56b40ff9524a)
+2026-07-17 13:10:18,212 - INFO - Poem 66115: got response for 12 verses (call 799fb4badf7e)
+2026-07-17 13:10:31,867 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:10:31,878 - INFO - Poem 69295: got response for 12 verses (call 07eb5df68f00)
+2026-07-17 13:11:00,961 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:11:00,972 - INFO - Poem 66664: got response for 12 verses (call 0fa06585d1ac)
+2026-07-17 13:11:07,058 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:11:07,069 - INFO - Poem 69735: got response for 12 verses (call 0e9ed7c7021f)
+2026-07-17 13:11:17,395 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:11:17,406 - INFO - Poem 8966: got response for 12 verses (call ce6af24ad02e)
+2026-07-17 13:11:32,193 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:11:32,203 - INFO - Poem 69546: got response for 12 verses (call d1c603a9973f)
+2026-07-17 13:11:36,073 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:11:36,083 - INFO - Poem 8052: got response for 12 verses (call 70f64de09c71)
+2026-07-17 13:11:47,557 - INFO - HTTP Request: POST https://integrate.api.nvidia.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-07-17 13:11:47,568 - INFO - Poem 74859: got response for 12 verses (call d24cab98f233)
+2026-07-17 13:11:47,569 - INFO - Generation pass done: 100 batches in 1034.9s
+2026-07-17 13:11:47,703 - INFO - Loaded existing registry with 1013 verses from /content/poetry-diacritization-pipeline/runtime/registry.pkl
