@@ -112,12 +112,17 @@ def fake_input_pickle(tmp_path):
                 {"verse_id": "1_001", "sadr": "...", "ajuz": "..."},
                 ...
             ]}
+        Any other keys on a poem dict besides poem_no/meter/verses (e.g.
+        POET_NAME, POET_RANK) are carried through as extra batch-level
+        columns on the input pickle, exactly like a real input pickle with
+        columns beyond poem_no/meter/DATA.
         """
         rows = [
             {
                 "poem_no": poem["poem_no"],
                 "meter": poem["meter"],
                 "DATA": poem["verses"],
+                **{k: v for k, v in poem.items() if k not in ("poem_no", "meter", "verses")},
             }
             for poem in poems
         ]

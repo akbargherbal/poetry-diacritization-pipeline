@@ -193,7 +193,9 @@ def test_run_generation_pass_passes_thinking_settings_to_call_llm(monkeypatch, m
     df = make_registry_df([{"verse_id": "1_001", "poem_no": 1, "status": "pending"}])
     seen_kwargs = {}
 
-    def fake_call_llm(client, verses, rate_limiter, model=None, thinking_enabled=None, reasoning_effort=None):
+    def fake_call_llm(
+        client, verses, rate_limiter, model=None, thinking_enabled=None, reasoning_effort=None, provider=None
+    ):
         seen_kwargs.update(
             model=model, thinking_enabled=thinking_enabled, reasoning_effort=reasoning_effort
         )

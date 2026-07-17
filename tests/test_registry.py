@@ -44,6 +44,55 @@ def test_build_registry_from_input_explodes_verses(fake_input_pickle):
     assert df.index.tolist() == ["1_001", "1_002", "2_001"]
 
 
+def test_build_registry_from_input_carries_extra_input_columns(fake_input_pickle):
+    """Any column beyond poem_no/meter/DATA on the input pickle (e.g.
+    POET_NAME, POET_RANK, batch_no, BATCH_SIZE) must be broadcast onto
+    every verse row exploded from that batch -- not silently dropped."""
+    path = fake_input_pickle(
+        [
+            {
+                "poem_no": 1,
+                "meter": "wafer",
+                "POET_NAME": "المتنبي",
+                "POET_RANK": 1,
+                "batch_no": 7,
+                "BATCH_SIZE": 2,
+                "verses": [
+                    {"verse_id": "1_001", "sadr": "سدر1", "ajuz": "عجز1"},
+                    {"verse_id": "1_002", "sadr": "سدر2", "ajuz": "عجز2"},
+                ],
+            },
+            {
+                "poem_no": 2,
+                "meter": "taweel",
+                "POET_NAME": "ابو تمام",
+                "POET_RANK": 2,
+                "batch_no": 3,
+                "BATCH_SIZE": 1,
+                "verses": [
+                    {"verse_id": "2_001", "sadr": "سدر3", "ajuz": "عجز3"},
+                ],
+            },
+        ]
+    )
+
+    df = registry.build_registry_from_input(path)
+
+    for col in ("POET_NAME", "POET_RANK", "batch_no", "BATCH_SIZE"):
+        assert col in df.columns
+
+    assert df.loc["1_001", "POET_NAME"] == "المتنبي"
+    assert df.loc["1_002", "POET_NAME"] == "المتنبي"
+    assert df.loc["2_001", "POET_NAME"] == "ابو تمام"
+    assert df.loc["1_001", "POET_RANK"] == 1
+    assert df.loc["1_001", "batch_no"] == 7
+    assert df.loc["1_001", "BATCH_SIZE"] == 2
+
+    # Core registry columns must still all be present alongside the extras.
+    for col in registry.REGISTRY_COLUMNS:
+        assert col in df.columns
+
+
 def test_build_registry_from_input_normalizes_text(fake_input_pickle):
     path = fake_input_pickle(
         [

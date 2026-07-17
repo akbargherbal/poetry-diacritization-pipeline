@@ -73,16 +73,31 @@ def build_registry_from_input(input_pickle_path: str = None) -> pd.DataFrame:
         )
     src = pd.read_pickle(input_pickle_path)
 
+    # Carry forward EVERY batch-level column from the input DataFrame onto
+    # each exploded verse row -- not just poem_no/meter. This is what lets
+    # you add your own columns to the input pickle (POET_NAME, POET_RANK,
+    # batch_no, BATCH_SIZE, whatever comes next) and have them show up on
+    # the registry automatically, without a matching code change here every
+    # time. `DATA` itself is the one column that's never carried forward
+    # as-is -- it's what gets exploded into rows in the first place.
+    # `poem_no` and `meter` are excluded from this generic pass-through
+    # because they already have dedicated, fixed positions in
+    # REGISTRY_COLUMNS (kept for backward compatibility with existing
+    # registries/tests) -- they're set explicitly below instead.
+    passthrough_cols = [c for c in src.columns if c not in ("DATA", "poem_no", "meter")]
+
     rows = []
     for _, batch_row in src.iterrows():
         poem_no = batch_row["poem_no"]
         meter = batch_row["meter"]
+        extra_fields = {col: batch_row[col] for col in passthrough_cols}
         for verse in batch_row["DATA"]:
             rows.append(
                 {
                     "verse_id": verse["verse_id"],
                     "poem_no": poem_no,
                     "meter": meter,
+                    **extra_fields,
                     "sadr_raw": verse["sadr"],
                     "ajuz_raw": verse["ajuz"],
                     "sadr_norm": normalize(verse["sadr"]),
@@ -103,7 +118,19 @@ def build_registry_from_input(input_pickle_path: str = None) -> pd.DataFrame:
                 }
             )
 
-    df = pd.DataFrame(rows, columns=REGISTRY_COLUMNS)
+    # Column order: the fixed REGISTRY_COLUMNS core, with any extra
+    # input-pickle columns spliced in right after `meter` (i.e. still near
+    # the other "carried from the source batch" fields) rather than at the
+    # end, purely for readability when someone opens the pickle by hand.
+    # When there are no extra columns (the common case, and every existing
+    # test fixture), this is byte-for-byte REGISTRY_COLUMNS -- no behavior
+    # change for anyone not adding new input columns.
+    meter_idx = REGISTRY_COLUMNS.index("meter")
+    all_columns = (
+        REGISTRY_COLUMNS[: meter_idx + 1] + passthrough_cols + REGISTRY_COLUMNS[meter_idx + 1 :]
+    )
+
+    df = pd.DataFrame(rows, columns=all_columns)
 
     if df["verse_id"].duplicated().any():
         dupes = df.loc[df["verse_id"].duplicated(), "verse_id"].tolist()

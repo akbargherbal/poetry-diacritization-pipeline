@@ -24,6 +24,7 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from . import config
+from .git_checkpoint import CheckpointCounter
 from .llm_client import SlidingWindowRateLimiter, call_llm, setup_client
 from .pricing import calculate_cost
 from .registry import save_registry
@@ -78,7 +79,17 @@ def _cost_fields_for_batch(model: str, usage: dict | None, n: int) -> dict | Non
 
 
 def _process_one_batch(
-    client, batch, rate_limiter, df, lock, save_reasoning, model, thinking_enabled, reasoning_effort
+    client,
+    batch,
+    rate_limiter,
+    df,
+    lock,
+    save_reasoning,
+    model,
+    thinking_enabled,
+    reasoning_effort,
+    provider=None,
+    checkpoint: CheckpointCounter = None,
 ):
     verse_ids = [v["id"] for v in batch["verses"]]
     content, reasoning, error, usage = call_llm(
@@ -88,6 +99,7 @@ def _process_one_batch(
         model=model,
         thinking_enabled=thinking_enabled,
         reasoning_effort=reasoning_effort,
+        provider=provider,
     )
 
     if error is not None or content is None:
@@ -117,6 +129,11 @@ def _process_one_batch(
 
     log.info(f"Poem {batch['poem_no']}: got response for {len(verse_ids)} verses (call {call_id})")
 
+    # Outside the registry lock -- a git push shouldn't hold up other
+    # threads' registry writes.
+    if checkpoint is not None:
+        checkpoint.batch_done()
+
 
 def run_generation_pass(
     df,
@@ -125,6 +142,9 @@ def run_generation_pass(
     thinking_enabled: bool = None,
     reasoning_effort: str = None,
     save_reasoning: bool = None,
+    provider: str = None,
+    checkpoint_every: int = None,
+    checkpoint_enabled: bool = None,
 ):
     """Run one generation pass over everything in df that needs an LLM attempt.
 
@@ -136,12 +156,23 @@ def run_generation_pass(
     save_reasoning defaults to config.SAVE_REASONING_ARTIFACTS (False) but can
     be overridden per call (that's how the CLI's --save-reasoning /
     --no-save-reasoning flags reach here).
+
+    provider defaults to config.MODEL_PROVIDER ("deepseek" unless
+    MODEL_PROVIDER=nvidia is set) and is used both for building the client
+    (if one isn't passed in) and for shaping each LLM call's request body.
+
+    checkpoint_every/checkpoint_enabled default to config's
+    CHECKPOINT_EVERY_N_BATCHES/CHECKPOINT_ENABLED. Every `checkpoint_every`
+    successfully completed batches, runtime/ is committed and pushed to
+    the git remote (see git_checkpoint.py) — a no-op, non-fatal warning if
+    that fails for any reason.
     """
     from .registry import make_batches
     import threading
 
+    provider = provider or config.MODEL_PROVIDER
     if client is None:
-        client = setup_client()
+        client = setup_client(provider=provider)
     if save_reasoning is None:
         save_reasoning = config.SAVE_REASONING_ARTIFACTS
     model = model or config.DEFAULT_MODEL
@@ -156,6 +187,7 @@ def run_generation_pass(
 
     rate_limiter = SlidingWindowRateLimiter(max_requests=config.REQUESTS_PER_MINUTE)
     lock = threading.Lock()
+    checkpoint = CheckpointCounter(every_n=checkpoint_every, enabled=checkpoint_enabled)
 
     start = time.time()
     with ThreadPoolExecutor(max_workers=config.MAX_WORKERS) as pool:
@@ -171,6 +203,8 @@ def run_generation_pass(
                 model,
                 thinking_enabled,
                 reasoning_effort,
+                provider,
+                checkpoint,
             )
             for batch in batches
         ]

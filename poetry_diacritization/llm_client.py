@@ -39,21 +39,47 @@ class SlidingWindowRateLimiter:
                 time.sleep(sleep_time)
 
 
-def setup_client() -> OpenAI:
-    api_key = os.getenv("DEEPSEEK_API_KEY")
-    if not api_key:
-        api_key = input("DEEPSEEK_API_KEY not set. Paste your DeepSeek API key: ").strip()
+# Per-provider connection details. Keeping this as one small table (rather
+# than an if/else sprinkled through setup_client) is what makes adding a
+# third provider later a one-entry change, not a re-read of this function.
+_PROVIDER_CONNECTION = {
+    config.PROVIDER_DEEPSEEK: {
+        "env_var": "DEEPSEEK_API_KEY",
+        "base_url": "https://api.deepseek.com",
+        "label": "DeepSeek",
+    },
+    config.PROVIDER_NVIDIA: {
+        "env_var": "NVIDIA_API_KEY",
+        "base_url": "https://integrate.api.nvidia.com/v1",
+        "label": "NVIDIA",
+    },
+}
 
-    client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
+
+def setup_client(provider: str = None) -> OpenAI:
+    """
+    Build an authenticated OpenAI-SDK client for the given provider.
+    `provider` defaults to config.MODEL_PROVIDER (i.e. whatever
+    MODEL_PROVIDER was resolved to at import time) but can be overridden
+    per call, same pattern as model/thinking_enabled elsewhere in this file.
+    """
+    provider = provider or config.MODEL_PROVIDER
+    conn = _PROVIDER_CONNECTION.get(provider, _PROVIDER_CONNECTION[config.PROVIDER_DEEPSEEK])
+
+    api_key = os.getenv(conn["env_var"])
+    if not api_key:
+        api_key = input(f"{conn['env_var']} not set. Paste your {conn['label']} API key: ").strip()
+
+    client = OpenAI(api_key=api_key, base_url=conn["base_url"])
 
     try:
         client.models.list()
-        log.info("DeepSeek API authentication successful.")
+        log.info(f"{conn['label']} API authentication successful.")
     except openai.AuthenticationError:
         log.error("Authentication failed — check your API key.")
         sys.exit(1)
     except Exception as e:
-        log.error(f"Error contacting DeepSeek API: {e}")
+        log.error(f"Error contacting {conn['label']} API: {e}")
         sys.exit(1)
 
     return client
@@ -101,6 +127,31 @@ def _extract_usage(response) -> dict | None:
     }
 
 
+def _build_extra_body(provider: str, thinking_enabled: bool, reasoning_effort: str) -> dict:
+    """
+    The thinking/reasoning-effort knobs are conceptually the same across
+    providers (from the CLI's point of view: --thinking/--no-thinking,
+    --reasoning-effort), but DeepSeek's native API and NVIDIA's NIM endpoint
+    expect that intent wrapped in different `extra_body` shapes. This is the
+    one place that difference lives, so call_llm itself doesn't need to
+    know or care which provider it's talking to beyond passing this through.
+    """
+    if provider == config.PROVIDER_NVIDIA:
+        # NVIDIA's OpenAI-compatible endpoint takes both knobs nested under
+        # chat_template_kwargs. Unlike the DeepSeek branch, reasoning_effort
+        # is sent unconditionally (harmless when thinking is off) to mirror
+        # NVIDIA's own documented usage exactly.
+        return {
+            "chat_template_kwargs": {
+                "thinking": bool(thinking_enabled),
+                "reasoning_effort": reasoning_effort,
+            }
+        }
+    # DeepSeek defaults thinking mode to ON — always send this explicitly
+    # so "disabled" is a real, enforced setting, not an assumption.
+    return {"thinking": {"type": "enabled" if thinking_enabled else "disabled"}}
+
+
 def call_llm(
     client: OpenAI,
     verses: list,
@@ -108,6 +159,7 @@ def call_llm(
     model: str = None,
     thinking_enabled: bool = None,
     reasoning_effort: str = None,
+    provider: str = None,
 ):
     """
     One API call for one batch of verses (a single poem's worth, <= BATCH_SIZE).
@@ -120,10 +172,11 @@ def call_llm(
     always None on error, and best-effort (may still be None on success if
     the API response carried no usage block).
 
-    model/thinking_enabled/reasoning_effort default to config.py's DEFAULT_*
-    values but can be overridden per call (that's how the CLI's --model,
+    model/thinking_enabled/reasoning_effort/provider default to config.py's
+    settings but can be overridden per call (that's how the CLI's --model,
     --thinking/--no-thinking, and --reasoning-effort flags reach here).
     """
+    provider = provider or config.MODEL_PROVIDER
     model = model or config.DEFAULT_MODEL
     if thinking_enabled is None:
         thinking_enabled = config.DEFAULT_THINKING_ENABLED
@@ -138,18 +191,25 @@ def call_llm(
         max_tokens=config.MAX_TOKENS,
         temperature=config.TEMPERATURE,
         top_p=config.TOP_P,
-        # DeepSeek defaults thinking mode to ON — always send this
-        # explicitly so "disabled" is a real, enforced setting, not an
-        # assumption.
-        extra_body={"thinking": {"type": "enabled" if thinking_enabled else "disabled"}},
+        extra_body=_build_extra_body(provider, thinking_enabled, reasoning_effort),
     )
-    if thinking_enabled:
+    # DeepSeek's native API takes reasoning_effort as a top-level param
+    # (only meaningful/sent when thinking is on); NVIDIA takes it nested
+    # inside extra_body's chat_template_kwargs instead (see
+    # _build_extra_body) — never both, to avoid sending a param the
+    # provider doesn't expect.
+    if provider != config.PROVIDER_NVIDIA and thinking_enabled:
         kwargs["reasoning_effort"] = reasoning_effort
 
     try:
         response = client.chat.completions.create(**kwargs)
         content = response.choices[0].message.content
-        reasoning = getattr(response.choices[0].message, "reasoning_content", None)
+        message = response.choices[0].message
+        # DeepSeek's SDK response exposes `reasoning_content`; NVIDIA's
+        # exposes `reasoning`. Check both rather than assuming one.
+        reasoning = getattr(message, "reasoning_content", None) or getattr(
+            message, "reasoning", None
+        )
         usage = _extract_usage(response)
         return content, reasoning, None, usage
     except Exception as e:

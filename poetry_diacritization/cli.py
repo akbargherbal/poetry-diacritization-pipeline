@@ -29,6 +29,7 @@ def cmd_status(args):
         print("\npyarud score distribution (all verses ever scored):")
         print(dist.to_string())
     print(f"\nRegistry: {len(df)} verses total, at {config.REGISTRY_PATH}")
+    print(f"Provider: {config.MODEL_PROVIDER} (model default: {config.DEFAULT_MODEL})")
 
 
 def cmd_generate(args):
@@ -39,6 +40,8 @@ def cmd_generate(args):
         thinking_enabled=args.thinking,
         reasoning_effort=args.reasoning_effort,
         save_reasoning=args.save_reasoning,
+        checkpoint_every=args.checkpoint_every,
+        checkpoint_enabled=args.checkpoint,
     )
     cmd_status(args)
 
@@ -76,6 +79,8 @@ def cmd_all(args):
         thinking_enabled=args.thinking,
         reasoning_effort=args.reasoning_effort,
         save_reasoning=args.save_reasoning,
+        checkpoint_every=args.checkpoint_every,
+        checkpoint_enabled=args.checkpoint,
     )
     run_validation_pass(df)
     apply_threshold(df, cutoff=args.cutoff, include_rescored=args.include_rescored)
@@ -151,6 +156,30 @@ def main():
             action="store_false",
             help=f"Do not persist reasoning traces (default: "
             f"{'off' if not config.SAVE_REASONING_ARTIFACTS else 'on'}).",
+        )
+        p.add_argument(
+            "--checkpoint-every",
+            dest="checkpoint_every",
+            type=int,
+            default=config.CHECKPOINT_EVERY_N_BATCHES,
+            help="Commit + push runtime/ every N completed batches "
+            f"(default: {config.CHECKPOINT_EVERY_N_BATCHES}). Assumes git "
+            "auth is already configured in this environment.",
+        )
+        checkpoint_group = p.add_mutually_exclusive_group()
+        checkpoint_group.add_argument(
+            "--checkpoint",
+            dest="checkpoint",
+            action="store_true",
+            default=config.CHECKPOINT_ENABLED,
+            help="Enable periodic git checkpoint pushes (default: "
+            f"{'on' if config.CHECKPOINT_ENABLED else 'off'}).",
+        )
+        checkpoint_group.add_argument(
+            "--no-checkpoint",
+            dest="checkpoint",
+            action="store_false",
+            help="Disable periodic git checkpoint pushes.",
         )
 
     p_generate = sub.add_parser("generate", help="Call the LLM for everything still pending")

@@ -100,13 +100,52 @@ os.makedirs(RAW_RESPONSES_DIR, exist_ok=True)
 BATCH_SIZE = 12  # verses per LLM call, per poem. Your "sweet spot" number.
 
 # ---------------------------------------------------------------------------
-# LLM / DeepSeek settings
+# LLM provider
+# ---------------------------------------------------------------------------
+# Two providers are supported: DeepSeek's first-party API (the default,
+# unchanged from before this setting existed), and NVIDIA's OpenAI-compatible
+# NIM endpoint (integrate.api.nvidia.com), which currently serves DeepSeek
+# models for free. Set the MODEL_PROVIDER env var to "nvidia" to switch;
+# anything else (including unset) keeps the original DeepSeek behavior.
+#
+# This is read once into a plain constant rather than checked ad hoc all
+# over the codebase, so every module agrees on which provider is active for
+# the whole run.
+PROVIDER_DEEPSEEK = "deepseek"
+PROVIDER_NVIDIA = "nvidia"
+SUPPORTED_PROVIDERS = [PROVIDER_DEEPSEEK, PROVIDER_NVIDIA]
+
+MODEL_PROVIDER = (
+    PROVIDER_NVIDIA if os.environ.get("MODEL_PROVIDER", "").strip().lower() == "nvidia"
+    else PROVIDER_DEEPSEEK
+)
+
+# ---------------------------------------------------------------------------
+# LLM / model settings
 # ---------------------------------------------------------------------------
 # DeepSeek's first-party API lineup (api-docs.deepseek.com), as of this
 # writing. deepseek-v4-flash is the cheaper/faster default; deepseek-v4-pro
 # is the stronger, more expensive one. Override per-run with `--model`.
-SUPPORTED_MODELS = ["deepseek-v4-pro", "deepseek-v4-flash"]
-DEFAULT_MODEL = "deepseek-v4-flash"
+DEEPSEEK_SUPPORTED_MODELS = ["deepseek-v4-pro", "deepseek-v4-flash"]
+DEEPSEEK_DEFAULT_MODEL = "deepseek-v4-flash"
+
+# NVIDIA's NIM endpoint, currently hosting DeepSeek models under a different
+# model-string naming scheme (the "deepseek-ai/" org prefix). Free for
+# developers as of this writing -- see pricing.py/pricing_config.py, which
+# already handle an unpriced model by leaving cost columns as None, so
+# running on this provider needs no pricing setup at all.
+NVIDIA_SUPPORTED_MODELS = ["deepseek-ai/deepseek-v4-flash"]
+NVIDIA_DEFAULT_MODEL = "deepseek-ai/deepseek-v4-flash"
+
+# Provider-aware view used everywhere else in the codebase (cli.py's
+# --model choices/default, llm_client.py's fallback when no model is passed
+# in) so nothing needs its own if/else on MODEL_PROVIDER.
+SUPPORTED_MODELS = (
+    NVIDIA_SUPPORTED_MODELS if MODEL_PROVIDER == PROVIDER_NVIDIA else DEEPSEEK_SUPPORTED_MODELS
+)
+DEFAULT_MODEL = (
+    NVIDIA_DEFAULT_MODEL if MODEL_PROVIDER == PROVIDER_NVIDIA else DEEPSEEK_DEFAULT_MODEL
+)
 
 MAX_TOKENS = 4000          # 12 short verses of JSON does not need 384k tokens
 TEMPERATURE = 0.4          # ignored by DeepSeek when thinking mode is on
@@ -139,6 +178,21 @@ SAVE_REASONING_ARTIFACTS = False
 
 MAX_WORKERS = 6            # concurrent threads
 REQUESTS_PER_MINUTE = 6    # rate limit
+
+# ---------------------------------------------------------------------------
+# Checkpointing (git push)
+# ---------------------------------------------------------------------------
+# Long generation runs (e.g. on a Colab instance that can disappear without
+# warning) commit + push runtime/ to the git remote every N completed
+# batches, so progress survives even if the runtime dies mid-run. This
+# assumes git authentication is already configured wherever the process
+# runs (e.g. `git config` + a credential helper set up in the notebook,
+# before calling into this pipeline) -- this pipeline never touches
+# credentials itself. See git_checkpoint.py.
+#
+# Override per-run with `--checkpoint-every` / disable with `--no-checkpoint`.
+CHECKPOINT_EVERY_N_BATCHES = 20
+CHECKPOINT_ENABLED = True
 
 # Statuses that still need an LLM attempt (fed into the next generate pass)
 NEEDS_GENERATION_STATUSES = (

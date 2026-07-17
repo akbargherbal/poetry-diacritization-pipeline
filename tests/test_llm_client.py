@@ -130,6 +130,101 @@ def test_call_llm_never_raises_on_client_exception(fake_openai_client, fake_rate
     assert "network exploded" in error
 
 
+def test_call_llm_nvidia_provider_uses_chat_template_kwargs_shape(
+    fake_openai_client, fake_rate_limiter
+):
+    client = fake_openai_client(response_content="[]")
+
+    call_llm(
+        client,
+        [{"id": "1"}],
+        fake_rate_limiter,
+        model="deepseek-ai/deepseek-v4-flash",
+        provider=config.PROVIDER_NVIDIA,
+        thinking_enabled=False,
+        reasoning_effort="high",
+    )
+
+    sent_kwargs = client.calls[0]
+    assert sent_kwargs["extra_body"] == {
+        "chat_template_kwargs": {"thinking": False, "reasoning_effort": "high"}
+    }
+    # NVIDIA never gets the DeepSeek-style top-level reasoning_effort param.
+    assert "reasoning_effort" not in sent_kwargs
+
+
+def test_call_llm_nvidia_provider_sends_reasoning_effort_even_when_thinking_off(
+    fake_openai_client, fake_rate_limiter
+):
+    client = fake_openai_client(response_content="[]")
+
+    call_llm(
+        client,
+        [{"id": "1"}],
+        fake_rate_limiter,
+        model="deepseek-ai/deepseek-v4-flash",
+        provider=config.PROVIDER_NVIDIA,
+        thinking_enabled=False,
+    )
+
+    assert client.calls[0]["extra_body"]["chat_template_kwargs"]["thinking"] is False
+
+
+def test_call_llm_deepseek_provider_unaffected_by_nvidia_branch(
+    fake_openai_client, fake_rate_limiter
+):
+    """Sanity check: default (no provider passed) behaves exactly as before."""
+    client = fake_openai_client(response_content="[]")
+
+    call_llm(client, [{"id": "1"}], fake_rate_limiter, thinking_enabled=True, reasoning_effort="max")
+
+    sent_kwargs = client.calls[0]
+    assert sent_kwargs["extra_body"] == {"thinking": {"type": "enabled"}}
+    assert sent_kwargs["reasoning_effort"] == "max"
+
+
+def test_call_llm_reads_reasoning_field_when_reasoning_content_absent(
+    fake_openai_client, fake_rate_limiter, monkeypatch
+):
+    """NVIDIA's SDK response exposes `reasoning`, not `reasoning_content` --
+    call_llm must fall back to it."""
+
+    class _NvidiaFakeChoice:
+        def __init__(self, content, reasoning):
+            self.message = type(
+                "FakeMessage", (), {"content": content, "reasoning": reasoning}
+            )()
+
+    class _NvidiaFakeCompletion:
+        def __init__(self, content, reasoning):
+            self.choices = [_NvidiaFakeChoice(content, reasoning)]
+            self.usage = None
+
+    class _NvidiaFakeClient:
+        def __init__(self):
+            self.calls = []
+            outer = self
+
+            class _Completions:
+                def create(self, **kwargs):
+                    outer.calls.append(kwargs)
+                    return _NvidiaFakeCompletion("[]", "because nvidia said so")
+
+            class _Chat:
+                def __init__(self):
+                    self.completions = _Completions()
+
+            self.chat = _Chat()
+
+    client = _NvidiaFakeClient()
+    content, reasoning, error, usage = call_llm(
+        client, [{"id": "1"}], fake_rate_limiter, provider=config.PROVIDER_NVIDIA
+    )
+
+    assert error is None
+    assert reasoning == "because nvidia said so"
+
+
 def test_call_llm_defaults_come_from_config(fake_openai_client, fake_rate_limiter, monkeypatch):
     monkeypatch.setattr(config, "DEFAULT_MODEL", "deepseek-v4-pro")
     client = fake_openai_client(response_content="[]")
@@ -199,3 +294,47 @@ def test_setup_client_prompts_for_key_when_env_var_unset(monkeypatch):
 
     client = setup_client()
     assert client.api_key == "typed-in-key"
+
+
+def test_setup_client_defaults_to_config_model_provider(monkeypatch):
+    """With no provider argument, setup_client reads config.MODEL_PROVIDER --
+    so the default (unset MODEL_PROVIDER env var) behaves exactly as it did
+    before NVIDIA support existed."""
+    monkeypatch.setattr(config, "MODEL_PROVIDER", config.PROVIDER_DEEPSEEK)
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "sk-fake")
+    monkeypatch.setattr(
+        llm_client, "OpenAI", lambda api_key, base_url: _FakeOpenAIForAuth(api_key, base_url)
+    )
+
+    client = setup_client()
+    assert client.base_url == "https://api.deepseek.com"
+
+
+def test_setup_client_nvidia_provider_uses_nvidia_key_and_base_url(monkeypatch):
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    monkeypatch.setenv("NVIDIA_API_KEY", "nvapi-fake")
+    monkeypatch.setattr(
+        llm_client, "OpenAI", lambda api_key, base_url: _FakeOpenAIForAuth(api_key, base_url)
+    )
+
+    client = setup_client(provider=config.PROVIDER_NVIDIA)
+    assert client.api_key == "nvapi-fake"
+    assert client.base_url == "https://integrate.api.nvidia.com/v1"
+
+
+def test_setup_client_nvidia_provider_prompts_for_key_when_env_var_unset(monkeypatch):
+    monkeypatch.delenv("NVIDIA_API_KEY", raising=False)
+    prompts = []
+
+    def _fake_input(prompt):
+        prompts.append(prompt)
+        return "typed-nvidia-key"
+
+    monkeypatch.setattr("builtins.input", _fake_input)
+    monkeypatch.setattr(
+        llm_client, "OpenAI", lambda api_key, base_url: _FakeOpenAIForAuth(api_key, base_url)
+    )
+
+    client = setup_client(provider=config.PROVIDER_NVIDIA)
+    assert client.api_key == "typed-nvidia-key"
+    assert "NVIDIA_API_KEY" in prompts[0]

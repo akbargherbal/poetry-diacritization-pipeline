@@ -178,6 +178,45 @@ def test_model_flag_passed_through(monkeypatch, stub_pipeline_funcs):
     assert kwargs["model"] == model
 
 
+# ---------------------------------------------------------------------------
+# --checkpoint-every / --checkpoint / --no-checkpoint
+# ---------------------------------------------------------------------------
+
+
+def test_checkpoint_every_defaults_to_config(monkeypatch, stub_pipeline_funcs):
+    _run_cli(monkeypatch, ["generate"])
+    _, kwargs = stub_pipeline_funcs["run_generation_pass"]
+    assert kwargs["checkpoint_every"] == config.CHECKPOINT_EVERY_N_BATCHES
+    assert kwargs["checkpoint_enabled"] == config.CHECKPOINT_ENABLED
+
+
+def test_checkpoint_every_flag_overrides_default(monkeypatch, stub_pipeline_funcs):
+    _run_cli(monkeypatch, ["generate", "--checkpoint-every", "5"])
+    _, kwargs = stub_pipeline_funcs["run_generation_pass"]
+    assert kwargs["checkpoint_every"] == 5
+
+
+def test_no_checkpoint_flag_disables_it(monkeypatch, stub_pipeline_funcs):
+    _run_cli(monkeypatch, ["generate", "--no-checkpoint"])
+    _, kwargs = stub_pipeline_funcs["run_generation_pass"]
+    assert kwargs["checkpoint_enabled"] is False
+
+
+def test_checkpoint_and_no_checkpoint_together_is_a_system_exit(monkeypatch):
+    monkeypatch.setattr(
+        "sys.argv", ["poetry_diacritization", "generate", "--checkpoint", "--no-checkpoint"]
+    )
+    with pytest.raises(SystemExit):
+        cli.main()
+
+
+def test_all_command_passes_checkpoint_args(monkeypatch, stub_pipeline_funcs):
+    _run_cli(monkeypatch, ["all", "--checkpoint-every", "3", "--no-checkpoint"])
+    _, kwargs = stub_pipeline_funcs["run_generation_pass"]
+    assert kwargs["checkpoint_every"] == 3
+    assert kwargs["checkpoint_enabled"] is False
+
+
 def test_input_flag_is_passed_to_load_or_build_registry(monkeypatch, make_registry_df):
     df = make_registry_df([{"verse_id": "1_001", "status": "pending"}])
     captured = {}
